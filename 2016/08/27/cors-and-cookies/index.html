@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>CORS和Cookies | Mirone</title>
+  <meta name="description" content="{{theme.description}}" />
+  <meta name="keywords" content="{{theme.keywords}}" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="pixiv-ID: 56852068
+
+本次的项目是为一个短期活动搭建Node.js服务端，部署在服务器上后发现同事在自己的本机使用需要携带Cookie的AJAX请求调用接口的时候,受到了同源策略的限制。因此我们需要在服务端对跨域请求开放许可。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CORS和Cookies">
+<meta property="og:url" content="http://lovin0730.github.io/2016/08/27/cors-and-cookies/index.html">
+<meta property="og:site_name" content="Mirone">
+<meta property="og:description" content="pixiv-ID: 56852068
+
+本次的项目是为一个短期活动搭建Node.js服务端，部署在服务器上后发现同事在自己的本机使用需要携带Cookie的AJAX请求调用接口的时候,受到了同源策略的限制。因此我们需要在服务端对跨域请求开放许可。">
+<meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/cors-and-cookies-cover.jpg">
+<meta property="og:updated_time" content="2016-09-01T11:12:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CORS和Cookies">
+<meta name="twitter:description" content="pixiv-ID: 56852068
+
+本次的项目是为一个短期活动搭建Node.js服务端，部署在服务器上后发现同事在自己的本机使用需要携带Cookie的AJAX请求调用接口的时候,受到了同源策略的限制。因此我们需要在服务端对跨域请求开放许可。">
+<meta name="twitter:image" content="http://oanr6klwj.bkt.clouddn.com/blog/cors-and-cookies-cover.jpg">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+	<script src="https://use.typekit.net/eyf3hir.js"></script>
+  <script>try{Typekit.load({ async: false });}catch(e){}</script>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+  <script>setLoadingBarProgress(20)</script>
+  
+  <div id="site-wrapper">
+    
+    <header id="header">
+	<div id="header-wrapper" class="clearfix">
+		<a id="logo" href="/">
+			<img src="/images/logo.png" />
+			<span id="site-desc">
+			  mirone keeps alive
+      </span>
+		</a>
+		<button id="site-nav-switch">
+	    <span class="icon icon-menu"></span>
+	  </button>
+	</div>
+	<aside id="site-menu">
+  	<nav>
+  		
+        <a href="/" class="nav-home nav">
+          Home
+        </a>
+      
+    </nav>
+	</aside>
+</header>
+    <script>setLoadingBarProgress(40);</script>
+    
+    <main id="main" role="main">
+      <article id="post-cors-and-cookies"
+  class="post article white-box article-type-post"
+  itemscope itemprop="blogPost">
+	<h2 class="title">
+  	<a href="/2016/08/27/cors-and-cookies/">
+    	CORS和Cookies
+    </a>
+  </h2>
+	<time>
+	  8月 27, 2016
+	</time>
+	<section class="content">
+  	<div class="article-entry" itemprop="articleBody">
+    	<p><img src="http://oanr6klwj.bkt.clouddn.com/blog/cors-and-cookies-cover.jpg" alt="cover"></p>
+<blockquote>
+<p><em>pixiv-ID: 56852068</em></p>
+</blockquote>
+<p>本次的项目是为一个短期活动搭建Node.js服务端，部署在服务器上后发现同事在自己的本机使用需要携带Cookie的AJAX请求调用接口的时候,受到了同源策略的限制。因此我们需要在服务端对跨域请求开放许可。</p>
+<a id="more"></a>
+<blockquote>
+<p>CORS是一个W3C标准， 全称是“跨域资源共享”（Cross-origin resource sharing）。<br>它允许了浏览器向跨源服务器发送AJAX请求。（受限于<a href="https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy" target="_blank" rel="external">同源策略</a>，一般的AJAX不能跨域）。</p>
+</blockquote>
+<p>跨域AJAX请求的发送源需要在服务端的许可名单之中，因此需要服务端对请求源开放许可。</p>
+<p>本次项目中的服务端语言是Node.js，一般来说开放许可的做法为响应的头信息添加一些字段。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">res.setHeader(<span class="string">'Access-Control-Allow-Origin'</span>, *);</div><div class="line"><span class="comment">//可以接受的源，*表示任意</span></div><div class="line">res.setHeader(<span class="string">'Access-Control-Allow-Headers'</span>, <span class="string">'X-Requested-With'</span>);</div><div class="line"><span class="comment">//预检的时候使用，指明请求中可以使用的自定义HTTP请求头</span></div><div class="line">res.setHeader(<span class="string">'Access-Control-Allow-Methos'</span>, <span class="string">'PUT, POST, GET, DELETE, OPTIONS'</span>);</div><div class="line"><span class="comment">//预检的时候使用，指明资源可以被请求的方式</span></div></pre></td></tr></table></figure>
+<p>但是如果在请求的时候，需要携带Cookie时，我们就需要在<strong>服务端和客户端</strong>两端做一些处理</p>
+<blockquote>
+<p>在客户端，我们需要给<code>XMLHTTPRequest</code>对象开启<code>withCredentials</code>属性，例如下面我封装的一个简单的AJAX请求。</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">AJAX</span>(<span class="params">method, URL, async, type, callback, data</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> xhr = <span class="keyword">new</span> XMLHttpRequest();</div><div class="line">    xhr.responseType = type;</div><div class="line">    <span class="comment">//开启withCredentials属性</span></div><div class="line">    xhr.withCredentials = <span class="literal">true</span>;</div><div class="line">    xhr.onreadystatechange = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (xhr.readyState == <span class="number">4</span> &amp;&amp; xhr.status == <span class="number">200</span>) &#123;</div><div class="line">            <span class="keyword">var</span> getRes = xhr.response;</div><div class="line">            callback(getRes);</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    xhr.onerror = <span class="function"><span class="keyword">function</span> (<span class="params">e</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.error(e);</div><div class="line">    &#125;;</div><div class="line">    xhr.open(method, URL, <span class="keyword">async</span>);</div><div class="line">    <span class="keyword">if</span> (data) &#123;</div><div class="line">      xhr.setRequestHeader(<span class="string">"Content-Type"</span>, <span class="string">"application/x-www-form-urlencoded"</span>);</div><div class="line">      xhr.send(data);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">      xhr.send();</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>在服务端，我们需要为响应的头信息添加<code>Access-Control-Allow-Credentials</code>。<strong>这时服务端必须制定请求的域名，不再能使用’*’</strong>, 我们需要针对不同访问设定跨源允许域，这时HTTP请求头的<code>Referer</code>值就很好用了，当在一个域下发起一个CORS请求时，HTTP请求头的<code>Referer</code>会自动设置为页面域，此时只要我们在服务端根据<code>Referer</code>值构造出相应的<code>Access-Control-Allow-Origin</code>值即可。</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> origin = req.headers.referer;</div><div class="line"><span class="keyword">if</span> (origin) &#123;</div><div class="line">  origin = origin.match(<span class="regexp">/^http:\/\/+[a-zA-Z0-9\.]+(\:[0-9]+)?/</span>);</div><div class="line">&#125;</div><div class="line">origin = origin ? origin[<span class="number">0</span>] : <span class="string">'your url'</span>;</div><div class="line">res.setHeader(<span class="string">'Access-Control-Allow-Origin'</span>, origin);</div><div class="line">res.setHeader(<span class="string">'Access-Control-Allow-Credentials'</span>, <span class="string">'true'</span>);</div></pre></td></tr></table></figure>
+<p>这样我们就可以尽情使用带Cookie的跨域了。</p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS" target="_blank" rel="external">更多关于CORS可以阅读本篇</a><br><a href="http://blog.hellofe.com/web/2014/12/28/the-CORS-protocol/" target="_blank" rel="external">使用Referer的灵感来自这里</a></p>
+
+  	</div>
+	  
+	  <div class="article-tags tags">
+		  
+        <a class="tag-link" href="/tags/Back-End/">Back-End</a><a class="tag-link" href="/tags/Node-js/">Node.js</a>
+      
+	  </div>
+	</section>
+</article>
+
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </main>
+    
+    <footer id="footer" class="clearfix">
+  
+  
+	<div class="search">
+	  <form name="searchform" id="searchform" class="searchform">
+	    <input type="text" id="search_input" class="search_input" placeholder="Looking for something?" />
+	    <button type="submit" class="search-bar-trigger">
+	      <span class="icon icon-search"></span>
+	    </button>
+	  </form>
+	</div>
+	
+
+	<div class="social-wrapper">
+  	
+      
+        <a href="https://github.com/lovin0730" class="social github"
+          target="_blank" rel="external">
+          <span class="icon icon-github"></span>
+        </a>
+      
+        <a href="https://twitter.com/xy610888871" class="social twitter"
+          target="_blank" rel="external">
+          <span class="icon icon-twitter"></span>
+        </a>
+      
+    
+  </div>
+  
+  <div>Theme <span class="codename">Typescript</span> designed by <a href="http://rakugaki.me/" target="_blank">Art Chen</a>.</div>
+  <div>&copy; <a href="/">Mirone</a></div>
+  
+</footer>
+
+
+    <script>setLoadingBarProgress(80);</script>
+    
+  </div>
+
+  <div id="modal-search">
+  <div class="modal">
+    <header class="modal-header clearfix">
+      <form id="modal-searchform" class="modal-searchform searchform" name="modalSearchform">
+        <input type="text" id="modal-searchinput" class="modal-input search_input" />
+        <button type="submit" class="search-bar-trigger">
+  	      <span class="icon icon-search"></span>
+  	    </button>
+      </form>
+      <a class="close">
+        <span class="icon icon-close"></span>
+      </a>
+      <div class="loading">
+        <div class="bar"></div>
+      </div>
+    </header>
+    <main class="modal-body">
+      <ul class="results ajax-content" id="modal-search-results">
+        
+      </ul>
+    </main>
+    <footer class="modal-footer ajax-content clearfix">
+      <div class="meta">
+        <strong class="range"></strong> of <strong class="total"></strong>
+      </div>
+      <div class="error"></div>
+      <a class="nav next">
+        <span class="text">NEXT</span>
+        <span class="icon icon-chevron-right"></span>
+      </a>
+      <a class="nav prev">
+        <span class="icon icon-chevron-left"></span>
+        <span class="text">PREV</span>
+      </a>
+    </footer>
+  </div>
+  <div class="overlay"></div>
+</div>
+  
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>')</script>
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+	var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+	var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+  var SEARCH_SERVICE = "hexo";
+</script>
+<script src="/js/min/search.min.js"></script>
+<script src="/js/min/app.min.js"></script>
+
+
+  <script>setLoadingBarProgress(100);</script>
+  
+</body>
+</html>

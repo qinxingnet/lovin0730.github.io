@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>Mirone</title>
+  <meta name="description" content="{{theme.description}}" />
+  <meta name="keywords" content="{{theme.keywords}}" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Mirone">
+<meta property="og:url" content="http://lovin0730.github.io/index.html">
+<meta property="og:site_name" content="Mirone">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mirone">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+	<script src="https://use.typekit.net/eyf3hir.js"></script>
+  <script>try{Typekit.load({ async: false });}catch(e){}</script>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+  <script>setLoadingBarProgress(20)</script>
+  
+  <div id="site-wrapper">
+    
+    <header id="header">
+	<div id="header-wrapper" class="clearfix">
+		<a id="logo" href="/">
+			<img src="/images/logo.png" />
+			<span id="site-desc">
+			  mirone keeps alive
+      </span>
+		</a>
+		<button id="site-nav-switch">
+	    <span class="icon icon-menu"></span>
+	  </button>
+	</div>
+	<aside id="site-menu">
+  	<nav>
+  		
+        <a href="/" class="nav-home nav">
+          Home
+        </a>
+      
+    </nav>
+	</aside>
+</header>
+    <script>setLoadingBarProgress(40);</script>
+    
+    <main id="main" role="main">
+      
+
+<section class="post-list">
+	
+    <article class="post ">
+
+  
+  <h2 class="title">
+    <a href="/2016/08/27/cors-and-cookies/">
+      CORS和Cookies
+    </a>
+  </h2>
+  
+  <time>
+    8月 27, 2016
+  </time>
+  <section class="content">
+	  <p><img src="http://oanr6klwj.bkt.clouddn.com/blog/cors-and-cookies-cover.jpg" alt="cover"></p>
+<blockquote>
+<p><em>pixiv-ID: 56852068</em></p>
+</blockquote>
+<p>本次的项目是为一个短期活动搭建Node.js服务端，部署在服务器上后发现同事在自己的本机使用需要携带Cookie的AJAX请求调用接口的时候,受到了同源策略的限制。因此我们需要在服务端对跨域请求开放许可。</p>
+
+    
+	  <div class="readmore">
+      <a href="/2016/08/27/cors-and-cookies/">Read More</a>
+    </div>
+    
+    
+    
+	  <div class="tags">
+      <a class="tag-link" href="/tags/Back-End/">Back-End</a><a class="tag-link" href="/tags/Node-js/">Node.js</a>
+	  </div>
+    
+
+  </section>
+</article>
+  
+    <article class="post ">
+
+  
+  <h2 class="title">
+    <a href="/2016/07/15/temperature-curve/">
+      实现温度曲线过程中的思考
+    </a>
+  </h2>
+  
+  <time>
+    7月 15, 2016
+  </time>
+  <section class="content">
+	  <p><img src="http://oanr6klwj.bkt.clouddn.com/blog/temperature-curve-cover.png" alt="cover"></p>
+<blockquote>
+<p><em>pixiv-ID: 50140585</em></p>
+</blockquote>
+<p>上周接到的需求是实现QQ浏览器中的一个温度曲线。具体来说就是传入一组数据，数据包括6天的当日最高温度和最低温度，由此拟合出一条曲线。</p>
+<p>曲线使用canvas进行绘制，因此有原生的贝塞尔曲线api可以使用。我们应该最大化的利用这个先天优势，避免过多的数学计算。</p>
+
+    
+	  <div class="readmore">
+      <a href="/2016/07/15/temperature-curve/">Read More</a>
+    </div>
+    
+    
+    
+	  <div class="tags">
+      <a class="tag-link" href="/tags/Front-End/">Front-End</a><a class="tag-link" href="/tags/Javascript/">Javascript</a>
+	  </div>
+    
+
+  </section>
+</article>
+  
+</section>
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </main>
+    
+    <footer id="footer" class="clearfix">
+  
+  
+	<div class="search">
+	  <form name="searchform" id="searchform" class="searchform">
+	    <input type="text" id="search_input" class="search_input" placeholder="Looking for something?" />
+	    <button type="submit" class="search-bar-trigger">
+	      <span class="icon icon-search"></span>
+	    </button>
+	  </form>
+	</div>
+	
+
+	<div class="social-wrapper">
+  	
+      
+        <a href="https://github.com/lovin0730" class="social github"
+          target="_blank" rel="external">
+          <span class="icon icon-github"></span>
+        </a>
+      
+        <a href="https://twitter.com/xy610888871" class="social twitter"
+          target="_blank" rel="external">
+          <span class="icon icon-twitter"></span>
+        </a>
+      
+    
+  </div>
+  
+  <div>Theme <span class="codename">Typescript</span> designed by <a href="http://rakugaki.me/" target="_blank">Art Chen</a>.</div>
+  <div>&copy; <a href="/">Mirone</a></div>
+  
+</footer>
+
+
+    <script>setLoadingBarProgress(80);</script>
+    
+  </div>
+
+  <div id="modal-search">
+  <div class="modal">
+    <header class="modal-header clearfix">
+      <form id="modal-searchform" class="modal-searchform searchform" name="modalSearchform">
+        <input type="text" id="modal-searchinput" class="modal-input search_input" />
+        <button type="submit" class="search-bar-trigger">
+  	      <span class="icon icon-search"></span>
+  	    </button>
+      </form>
+      <a class="close">
+        <span class="icon icon-close"></span>
+      </a>
+      <div class="loading">
+        <div class="bar"></div>
+      </div>
+    </header>
+    <main class="modal-body">
+      <ul class="results ajax-content" id="modal-search-results">
+        
+      </ul>
+    </main>
+    <footer class="modal-footer ajax-content clearfix">
+      <div class="meta">
+        <strong class="range"></strong> of <strong class="total"></strong>
+      </div>
+      <div class="error"></div>
+      <a class="nav next">
+        <span class="text">NEXT</span>
+        <span class="icon icon-chevron-right"></span>
+      </a>
+      <a class="nav prev">
+        <span class="icon icon-chevron-left"></span>
+        <span class="text">PREV</span>
+      </a>
+    </footer>
+  </div>
+  <div class="overlay"></div>
+</div>
+  
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>')</script>
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+	var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+	var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+  var SEARCH_SERVICE = "hexo";
+</script>
+<script src="/js/min/search.min.js"></script>
+<script src="/js/min/app.min.js"></script>
+
+
+  <script>setLoadingBarProgress(100);</script>
+  
+</body>
+</html>

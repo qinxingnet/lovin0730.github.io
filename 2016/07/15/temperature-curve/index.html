@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>实现温度曲线过程中的思考 | Mirone</title>
+  <meta name="description" content="{{theme.description}}" />
+  <meta name="keywords" content="{{theme.keywords}}" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="pixiv-ID: 50140585
+
+上周接到的需求是实现QQ浏览器中的一个温度曲线。具体来说就是传入一组数据，数据包括6天的当日最高温度和最低温度，由此拟合出一条曲线。
+曲线使用canvas进行绘制，因此有原生的贝塞尔曲线api可以使用。我们应该最大化的利用这个先天优势，避免过多的数学计算。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实现温度曲线过程中的思考">
+<meta property="og:url" content="http://lovin0730.github.io/2016/07/15/temperature-curve/index.html">
+<meta property="og:site_name" content="Mirone">
+<meta property="og:description" content="pixiv-ID: 50140585
+
+上周接到的需求是实现QQ浏览器中的一个温度曲线。具体来说就是传入一组数据，数据包括6天的当日最高温度和最低温度，由此拟合出一条曲线。
+曲线使用canvas进行绘制，因此有原生的贝塞尔曲线api可以使用。我们应该最大化的利用这个先天优势，避免过多的数学计算。">
+<meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/temperature-curve-cover.png">
+<meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/temperature-curve-design.png">
+<meta property="og:updated_time" content="2016-09-01T11:12:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实现温度曲线过程中的思考">
+<meta name="twitter:description" content="pixiv-ID: 50140585
+
+上周接到的需求是实现QQ浏览器中的一个温度曲线。具体来说就是传入一组数据，数据包括6天的当日最高温度和最低温度，由此拟合出一条曲线。
+曲线使用canvas进行绘制，因此有原生的贝塞尔曲线api可以使用。我们应该最大化的利用这个先天优势，避免过多的数学计算。">
+<meta name="twitter:image" content="http://oanr6klwj.bkt.clouddn.com/blog/temperature-curve-cover.png">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+	<script src="https://use.typekit.net/eyf3hir.js"></script>
+  <script>try{Typekit.load({ async: false });}catch(e){}</script>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+  <script>setLoadingBarProgress(20)</script>
+  
+  <div id="site-wrapper">
+    
+    <header id="header">
+	<div id="header-wrapper" class="clearfix">
+		<a id="logo" href="/">
+			<img src="/images/logo.png" />
+			<span id="site-desc">
+			  mirone keeps alive
+      </span>
+		</a>
+		<button id="site-nav-switch">
+	    <span class="icon icon-menu"></span>
+	  </button>
+	</div>
+	<aside id="site-menu">
+  	<nav>
+  		
+        <a href="/" class="nav-home nav">
+          Home
+        </a>
+      
+    </nav>
+	</aside>
+</header>
+    <script>setLoadingBarProgress(40);</script>
+    
+    <main id="main" role="main">
+      <article id="post-temperature-curve"
+  class="post article white-box article-type-post"
+  itemscope itemprop="blogPost">
+	<h2 class="title">
+  	<a href="/2016/07/15/temperature-curve/">
+    	实现温度曲线过程中的思考
+    </a>
+  </h2>
+	<time>
+	  7月 15, 2016
+	</time>
+	<section class="content">
+  	<div class="article-entry" itemprop="articleBody">
+    	<p><img src="http://oanr6klwj.bkt.clouddn.com/blog/temperature-curve-cover.png" alt="cover"></p>
+<blockquote>
+<p><em>pixiv-ID: 50140585</em></p>
+</blockquote>
+<p>上周接到的需求是实现QQ浏览器中的一个温度曲线。具体来说就是传入一组数据，数据包括6天的当日最高温度和最低温度，由此拟合出一条曲线。</p>
+<p>曲线使用canvas进行绘制，因此有原生的贝塞尔曲线api可以使用。我们应该最大化的利用这个先天优势，避免过多的数学计算。</p>
+<a id="more"></a>
+<p>在这个需求中，有两个很有趣的点：</p>
+<ul>
+<li>如果出现天气变化很小的情况：比如前四天气温都为22°~23°，第五天的变为23°~24°，那么曲线中这一变化是否应该表现的非常明显？</li>
+<li>给定的温度是一个区间，那么如何在这个区间中用一条<strong>平滑</strong>曲线较为准确的描绘出变化？</li>
+</ul>
+<p>需求的设计稿如下：<br><img src="http://oanr6klwj.bkt.clouddn.com/blog/temperature-curve-design.png" alt="design curve"></p>
+<hr>
+<p>经过思考，个人认为处理上述两个问题的办法是:</p>
+<blockquote>
+<ul>
+<li>如果温度变化情况很小，那么曲线的变化也不宜过大，以免给长期用户造成困扰。</li>
+<li><p>这条曲线不采用描点-连线-折线转曲线的方式来描绘，也不采用点拟合曲线的方式来进行，理由如下：</p>
+<ul>
+<li>描点-连线-折线转曲线面对的一个很棘手的问题就是对于曲线曲度的把握，而且需要进行的向量计算可能会对性能产生一些影响。</li>
+<li>点拟合曲线是一个稳妥的方式，但是需要面对的问题是超大的计算量。而且对于气温变化大的城市很可能出现曲线偏离其中一点很远的情况。</li>
+</ul>
+</li>
+<li><p>综上所述，我采取了一种折线拟合曲线的方式，这个方式非常有趣，灵感来自<a href="https://github.com/hongru/Canvas-Tattle/issues/19" target="_blank" rel="external">这里</a></p>
+</li>
+<li><p>但是这个办法有一个很大的问题就是：书写上下温度值的时候如何确定在线上的点的Y坐标，我们需要一个算法去解决它。</p>
+</li>
+</ul>
+</blockquote>
+<p>因此代码核心分为三部分：</p>
+<ol>
+<li>第一部分是如何让曲线变化根据温差大小进行适度的变化，温差大变化大，温差小变化小。且能够容纳足够的温度变化区间。</li>
+<li>第二部分是如何把折线拟合为平滑曲线。</li>
+<li>第三部分是确立算法求解特定点的Y坐标。</li>
+</ol>
+<hr>
+<p>处理第一部分的办法是根据给定的数据计算出一个参考区间，然后根据这个参考区间来描绘曲线。例如，现在的温度数据是上图设计图所示的温度数据，那么理想的温度区间就是28~10。因此，首先要<strong>计算合理温度区间</strong>。其次，区间计算出来之后，我们在canvas上的坐标和温度在这个区间中的位置是成比例的，因此要<strong>计算温度点对应canvas画布中的位置</strong></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//参数设置</span></div><div class="line"><span class="keyword">var</span> cfg = &#123;</div><div class="line">  canvasWidth: <span class="number">660</span>, <span class="comment">//画布宽度</span></div><div class="line">  canvasHeight: <span class="number">228</span>,  <span class="comment">//画布高度</span></div><div class="line">  blankX: <span class="number">0</span>, <span class="comment">//曲线横向留白</span></div><div class="line">  blankT: <span class="number">30</span>, <span class="comment">//文字横向留白</span></div><div class="line">  blankY: <span class="number">35</span>  <span class="comment">//曲线纵向留白</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> setting = &#123;</div><div class="line">  lineWidth: <span class="number">1</span>, <span class="comment">//曲线粗细</span></div><div class="line">  lineColor: <span class="string">'#fff'</span>, <span class="comment">//曲线颜色</span></div><div class="line">  base: <span class="number">5</span>, <span class="comment">//区间基准值</span></div><div class="line">  textSize: <span class="number">24</span>, <span class="comment">//文字大小</span></div><div class="line">  textOffSet: <span class="number">34</span>, <span class="comment">//文字与曲线距离</span></div><div class="line">  textColor: <span class="string">'#fff'</span>, <span class="comment">//文字颜色</span></div><div class="line">  font: <span class="string">'arial'</span> <span class="comment">//文字字体</span></div><div class="line">&#125;</div><div class="line"><span class="comment">/**</span></div><div class="line"> * 处理初始温度,取得平均值</div><div class="line"> * @param  Array data [原始数据]</div><div class="line"> * @return Array      [处理过的数据]</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> getData = <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> _getData = [],</div><div class="line">      _avarage;</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> _i = <span class="number">0</span>; _i &lt; data.length; _i++) &#123;</div><div class="line">    _avarage = (data[_i][<span class="number">0</span>] + data[_i][<span class="number">1</span>]) / <span class="number">2</span>;</div><div class="line">    _getData.push(_avarage);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> _getData;</div><div class="line">&#125;</div><div class="line"><span class="comment">/**</span></div><div class="line"> * 选择合理的温度区间</div><div class="line"> * @param  Array getData [处理过的数据]</div><div class="line"> * @return Number         [所属区间等级]</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> choseRank = <span class="function"><span class="keyword">function</span>(<span class="params">getData</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> _max = -<span class="literal">Infinity</span>,</div><div class="line">      _min = <span class="literal">Infinity</span>,</div><div class="line">      _res,</div><div class="line">      _cur,</div><div class="line">      _rank;</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> _i = <span class="number">0</span>; _i &lt; getData.length; _i++) &#123;</div><div class="line">    _cur = getData[_i];</div><div class="line">    <span class="keyword">if</span> (_cur &gt; _max) &#123;</div><div class="line">      _max = _cur;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (_cur &lt; _min) &#123;</div><div class="line">      _min = _cur;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  _res = _max - _min;</div><div class="line">  _rank = <span class="built_in">Math</span>.round(_res / setting.base) + <span class="number">1</span>;</div><div class="line">  <span class="keyword">return</span> _rank * setting.base;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>处理第二部分的办法就来自于上述那个链接中的灵感。假设我们有点A、B、C、D、E。那么我们以A为起点，B、C的中点为终点，B为参考点做贝塞尔曲线;然后接着以C、D的中点为终点，C为参考点做贝塞尔曲线，以此类推。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 绘制曲线主函数</div><div class="line"> * @param  element canvas [要绘制的元素]</div><div class="line"> * @param  Array data   [原始数据]</div><div class="line"> * @return</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> draw_MAIN = <span class="function"><span class="keyword">function</span>(<span class="params">canvas, data</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> _dataGot = getData(data);</div><div class="line">  <span class="keyword">var</span> _rank = choseRank(_dataGot);</div><div class="line">  <span class="keyword">var</span> _totalPoint = _dataGot.length;</div><div class="line">  <span class="keyword">var</span> _sum = getSum(_dataGot);</div><div class="line">  <span class="keyword">var</span> _avr = <span class="built_in">Math</span>.round(_sum / _totalPoint);</div><div class="line">  <span class="keyword">var</span> _low = _avr - _rank / <span class="number">2</span>,</div><div class="line">      _high = _avr + _rank / <span class="number">2</span>,</div><div class="line">      _interval = (cfg.canvasWidth - cfg.blankX * <span class="number">2</span>) / (_totalPoint - <span class="number">1</span>),</div><div class="line">      _intervalT = (cfg.canvasWidth - cfg.blankT * <span class="number">2</span>) / (_totalPoint - <span class="number">1</span>),</div><div class="line">      _curSupport,</div><div class="line">      _cur,</div><div class="line">      _next;</div><div class="line"></div><div class="line">  <span class="keyword">var</span> _curPoint = cfg.blankX;</div><div class="line">  <span class="keyword">var</span> getY = <span class="function"><span class="keyword">function</span>(<span class="params">i</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> cfg.canvasHeight - cfg.blankY - (_dataGot[i] - _low) *</div><div class="line">           (cfg.canvasHeight - cfg.blankY * <span class="number">2</span>) / _rank;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (canvas.getContext) &#123;</div><div class="line">    <span class="keyword">var</span> _ctx = canvas.getContext(<span class="string">'2d'</span>);</div><div class="line">    _ctx.imageSmoothingEnabled = <span class="literal">true</span>;</div><div class="line">    _ctx.strokeStyle = setting.lineColor;</div><div class="line">    _ctx.lineWidth = setting.lineWidth;</div><div class="line">    _ctx.lineCap = <span class="string">'round'</span>;</div><div class="line">    _ctx.beginPath();</div><div class="line">    _ctx.moveTo(_curPoint, getY(<span class="number">0</span>));</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> _i = <span class="number">0</span>; _i &lt; _dataGot.length - <span class="number">1</span>; _i++) &#123;</div><div class="line">      _cur = getY(_i + <span class="number">1</span>);</div><div class="line">      _next = getY(_i + <span class="number">2</span>);</div><div class="line">      _curSupport = getSupportPoint(_cur, _next);</div><div class="line">      <span class="keyword">if</span> (_i &lt; _dataGot.length - <span class="number">2</span>) &#123;</div><div class="line">        _ctx.quadraticCurveTo(_curPoint + _interval, _cur,</div><div class="line">          _curPoint + _interval * <span class="number">1.5</span>, _curSupport);</div><div class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (_i &gt;= _dataGot.length - <span class="number">2</span>) &#123;</div><div class="line">        _ctx.quadraticCurveTo(_curPoint, getY(_i),</div><div class="line">          _curPoint + _interval, _cur);</div><div class="line">      &#125;</div><div class="line">      _curPoint += _interval;</div><div class="line">      _ctx.stroke();</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>这时我们需要一个算法来计算出bezier-curve上特定点的坐标，canvas没有给我们提供相应的api，需要我们<strong>根据bezier函数</strong>自己来完成，这里我放上两个参考链接</p>
+<blockquote>
+<p><a href="http://www.cnblogs.com/jay-dong/archive/2012/09/26/2704188.html" target="_blank" rel="external">贝塞尔曲线初探</a><br><a href="http://stackoverflow.com/questions/14174252/how-to-find-out-y-coordinate-of-specific-point-in-bezier-curve-in-canvas" target="_blank" rel="external">stackoverflow上的问题</a></p>
+</blockquote>
+<p>最后得出的函数为：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 计算目标X对应Y值</div><div class="line"> * @param  Object start   [起始点]</div><div class="line"> * @param  Object control [控制点]</div><div class="line"> * @param  Object end     [终点]</div><div class="line"> * @param  Number X       [目标横坐标]</div><div class="line"> * @return Number         [目标纵坐标]</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> getYValues = <span class="function"><span class="keyword">function</span>(<span class="params">start, control, end, X</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> _q1,</div><div class="line">      _q2,</div><div class="line">      _q3,</div><div class="line">      _t,</div><div class="line">      _y;</div><div class="line">  _q1 = <span class="number">2</span> * start.x - <span class="number">2</span> * control.x;</div><div class="line">  _q2 = <span class="built_in">Math</span>.sqrt(<span class="number">5</span> * start.x * start.x - <span class="number">10</span> * start.x * control.x +</div><div class="line">    start.x * end.x - start.x * X + <span class="number">2</span> * control.x * X +</div><div class="line">    <span class="number">4</span> * control.x * control.x );</div><div class="line">  _q3 = <span class="number">2</span> * start.x - <span class="number">4</span> * control.x + <span class="number">2</span> * end.x;</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (_q3 !== <span class="number">0</span>) &#123;</div><div class="line">    _t = (_q1 + _q2) / _q3;</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    _t = ( X - start.x) / (<span class="number">2</span>*control.x - <span class="number">2</span>*start.x);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">if</span> (_t &lt; <span class="number">0</span>) &#123;</div><div class="line">    _t = <span class="number">-1</span> * _t;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  _y = start.y * (<span class="number">1</span> - _t) * (<span class="number">1</span> - _t) + control.y * <span class="number">2</span> * (<span class="number">1</span> - _t)</div><div class="line">    * _t + end.y * _t * _t;</div><div class="line">  <span class="keyword">return</span> _y;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>需要注意的是canvas绘制曲线会产生锯齿，除了开启浏览器抗锯齿以外，按照二倍图来绘制然后再缩小也是行之有效的方法，这里给出一个笨办法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">/**</span></div><div class="line"> * 缩放X倍canvas图</div><div class="line"> * @param  Number num     [要放大的倍数]</div><div class="line"> * @param  Object cfg     [your cfg]</div><div class="line"> * @param  Object setting [your setting]</div><div class="line"> * @return</div><div class="line"> */</div><div class="line"><span class="keyword">var</span> setScale = <span class="function"><span class="keyword">function</span>(<span class="params">num, cfg, setting</span>) </span>&#123;</div><div class="line">  cfg.canvasWidth *= num;</div><div class="line">  cfg.canvasHeight *= num;</div><div class="line">  cfg.blankX *= num;</div><div class="line">  cfg.blankT *= num;</div><div class="line">  cfg.blankY *= num;</div><div class="line">  setting.lineWidth *= num;</div><div class="line">  setting.base *= num;</div><div class="line">  setting.textSize *= num;</div><div class="line">  setting.textOffSet *= num;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<hr>
+<p>所以最终代码为:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">drawTemperature</span>(<span class="params">canvas, data</span>) </span>&#123;</div><div class="line"><span class="keyword">var</span> cfg = &#123;</div><div class="line">  canvasWidth: <span class="number">660</span>, <span class="comment">//画布宽度</span></div><div class="line">  canvasHeight: <span class="number">228</span>,  <span class="comment">//画布高度</span></div><div class="line">  blankX: <span class="number">0</span>, <span class="comment">//曲线横向留白</span></div><div class="line">  blankT: <span class="number">30</span>, <span class="comment">//文字横向留白</span></div><div class="line">  blankY: <span class="number">35</span>  <span class="comment">//曲线纵向留白</span></div><div class="line">&#125;;</div><div class="line"><span class="keyword">var</span> setting = &#123;</div><div class="line">  lineWidth: <span class="number">1</span>, <span class="comment">//曲线粗细</span></div><div class="line">  lineColor: <span class="string">'#fff'</span>, <span class="comment">//曲线颜色</span></div><div class="line">  base: <span class="number">5</span>, <span class="comment">//区间基准值</span></div><div class="line">  textSize: <span class="number">24</span>, <span class="comment">//文字大小</span></div><div class="line">  textOffSet: <span class="number">34</span>, <span class="comment">//文字与曲线距离</span></div><div class="line">  textColor: <span class="string">'#fff'</span>, <span class="comment">//文字颜色</span></div><div class="line">  font: <span class="string">'arial'</span> <span class="comment">//文字字体</span></div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> getData = <span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> _getData = [],</div><div class="line">      _avarage;</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> _i = <span class="number">0</span>; _i &lt; data.length; _i++) &#123;</div><div class="line">    _avarage = (data[_i][<span class="number">0</span>] + data[_i][<span class="number">1</span>]) / <span class="number">2</span>;</div><div class="line">    _getData.push(_avarage);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> _getData;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> choseRank = <span class="function"><span class="keyword">function</span>(<span class="params">getData</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> _max = -<span class="literal">Infinity</span>,</div><div class="line">      _min = <span class="literal">Infinity</span>,</div><div class="line">      _res,</div><div class="line">      _cur,</div><div class="line">      _rank;</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> _i = <span class="number">0</span>; _i &lt; getData.length; _i++) &#123;</div><div class="line">    _cur = getData[_i];</div><div class="line">    <span class="keyword">if</span> (_cur &gt; _max) &#123;</div><div class="line">      _max = _cur;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (_cur &lt; _min) &#123;</div><div class="line">      _min = _cur;</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  _res = _max - _min;</div><div class="line">  _rank = <span class="built_in">Math</span>.round(_res / setting.base) + <span class="number">1</span>;</div><div class="line">  <span class="keyword">return</span> _rank * setting.base;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> getYValues = <span class="function"><span class="keyword">function</span>(<span class="params">start, control, end, X</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> _q1,</div><div class="line">      _q2,</div><div class="line">      _q3,</div><div class="line">      _t,</div><div class="line">      _y;</div><div class="line">  _q1 = <span class="number">2</span> * start.x - <span class="number">2</span> * control.x;</div><div class="line">  _q2 = <span class="built_in">Math</span>.sqrt(<span class="number">5</span> * start.x * start.x - <span class="number">10</span> * start.x * control.x +</div><div class="line">    start.x * end.x - start.x * X + <span class="number">2</span> * control.x * X +</div><div class="line">    <span class="number">4</span> * control.x * control.x );</div><div class="line">  _q3 = <span class="number">2</span> * start.x - <span class="number">4</span> * control.x + <span class="number">2</span> * end.x;</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (_q3 !== <span class="number">0</span>) &#123;</div><div class="line">    _t = (_q1 + _q2) / _q3;</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    _t = ( X - start.x) / (<span class="number">2</span>*control.x - <span class="number">2</span>*start.x);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">if</span> (_t &lt; <span class="number">0</span>) &#123;</div><div class="line">    _t = <span class="number">-1</span> * _t;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  _y = start.y * (<span class="number">1</span> - _t) * (<span class="number">1</span> - _t) + control.y * <span class="number">2</span> * (<span class="number">1</span> - _t)</div><div class="line">    * _t + end.y * _t * _t;</div><div class="line">  <span class="keyword">return</span> _y;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> setScale = <span class="function"><span class="keyword">function</span>(<span class="params">num, cfg, setting</span>) </span>&#123;</div><div class="line">  cfg.canvasWidth *= num;</div><div class="line">  cfg.canvasHeight *= num;</div><div class="line">  cfg.blankX *= num;</div><div class="line">  cfg.blankT *= num;</div><div class="line">  cfg.blankY *= num;</div><div class="line">  setting.lineWidth *= num;</div><div class="line">  setting.base *= num;</div><div class="line">  setting.textSize *= num;</div><div class="line">  setting.textOffSet *= num;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> getSum = <span class="function"><span class="keyword">function</span>(<span class="params">getData</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> _sum = <span class="number">0</span>;</div><div class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> _i = <span class="number">0</span>; _i &lt; getData.length; _i++) &#123;</div><div class="line">    _sum = _sum + getData[_i];</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> _sum;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> getSupportPoint = <span class="function"><span class="keyword">function</span>(<span class="params">prev, next</span>) </span>&#123;</div><div class="line">  <span class="keyword">return</span> (prev + next) / <span class="number">2</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> draw_MAIN = <span class="function"><span class="keyword">function</span>(<span class="params">canvas, data</span>) </span>&#123;</div><div class="line">  setScale(<span class="number">2</span>, cfg, setting);</div><div class="line">  <span class="keyword">var</span> _dataGot = getData(data);</div><div class="line">  <span class="keyword">var</span> _rank = choseRank(_dataGot);</div><div class="line">  <span class="keyword">var</span> _totalPoint = _dataGot.length;</div><div class="line">  <span class="keyword">var</span> _sum = getSum(_dataGot);</div><div class="line">  <span class="keyword">var</span> _avr = <span class="built_in">Math</span>.round(_sum / _totalPoint);</div><div class="line">  <span class="keyword">var</span> _low = _avr - _rank / <span class="number">2</span>,</div><div class="line">      _high = _avr + _rank / <span class="number">2</span>,</div><div class="line">      _interval = (cfg.canvasWidth - cfg.blankX * <span class="number">2</span>) / (_totalPoint - <span class="number">1</span>),</div><div class="line">      _intervalT = (cfg.canvasWidth - cfg.blankT * <span class="number">2</span>) / (_totalPoint - <span class="number">1</span>),</div><div class="line">      _start = &#123;&#125;,</div><div class="line">      _control = &#123;&#125;,</div><div class="line">      _end = &#123;&#125;,</div><div class="line">      _Y,</div><div class="line">      _curSupport,</div><div class="line">      _cur,</div><div class="line">      _next;</div><div class="line"></div><div class="line">  <span class="keyword">var</span> _curPoint = cfg.blankX;</div><div class="line">  <span class="keyword">var</span> _curPointT = cfg.blankT;</div><div class="line">  <span class="keyword">var</span> getY = <span class="function"><span class="keyword">function</span>(<span class="params">i</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> cfg.canvasHeight - cfg.blankY - (_dataGot[i] - _low) *</div><div class="line">           (cfg.canvasHeight - cfg.blankY * <span class="number">2</span>) / _rank;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">if</span> (canvas.getContext) &#123;</div><div class="line">    <span class="keyword">var</span> _ctx = canvas.getContext(<span class="string">'2d'</span>);</div><div class="line">    _ctx.imageSmoothingEnabled = <span class="literal">true</span>;</div><div class="line">    _ctx.strokeStyle = setting.lineColor;</div><div class="line">    _ctx.lineWidth = setting.lineWidth;</div><div class="line">    _ctx.lineCap = <span class="string">'round'</span>;</div><div class="line"></div><div class="line">    _ctx.font = setting.textSize + <span class="string">'px '</span> + setting.font;</div><div class="line">    _ctx.fillStyle = setting.textColor;</div><div class="line">    _ctx.textAlign = <span class="string">'center'</span>;</div><div class="line">    _ctx.textBaseline = <span class="string">'middle'</span>;</div><div class="line"></div><div class="line">    _ctx.fillText(data[<span class="number">0</span>][<span class="number">1</span>] + <span class="string">"°"</span>, _curPointT,</div><div class="line">      getY(<span class="number">0</span>) - setting.textOffSet);</div><div class="line">    _ctx.fillText(data[<span class="number">0</span>][<span class="number">0</span>] + <span class="string">"°"</span>, _curPointT,</div><div class="line">      getY(<span class="number">0</span>) + setting.textOffSet);</div><div class="line"></div><div class="line">    _ctx.beginPath();</div><div class="line"></div><div class="line">    _ctx.moveTo(_curPoint, getY(<span class="number">0</span>));</div><div class="line"></div><div class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> _i = <span class="number">0</span>; _i &lt; _dataGot.length - <span class="number">1</span>; _i++) &#123;</div><div class="line">      _cur = getY(_i + <span class="number">1</span>);</div><div class="line">      _next = getY(_i + <span class="number">2</span>);</div><div class="line">      _curSupport = getSupportPoint(_cur, _next);</div><div class="line"></div><div class="line">      <span class="keyword">if</span> (_i === <span class="number">0</span>) &#123;</div><div class="line">        _start.x = _curPoint;</div><div class="line">        _start.y = getY(<span class="number">0</span>);</div><div class="line">        _control.x = _curPoint + _interval;</div><div class="line">        _control.y = _cur;</div><div class="line">        _end.x = _curPoint + _interval * <span class="number">1.5</span>;</div><div class="line">        _end.y = _curSupport;</div><div class="line">        _Y = getYValues(_start, _control, _end, _curPoint + _interval);</div><div class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (_i &lt; _dataGot.length - <span class="number">2</span>) &#123;</div><div class="line">        _start.x = _curPoint + _interval * <span class="number">0.5</span>;</div><div class="line">        _start.y = getSupportPoint(getY(_i), getY(_i + <span class="number">1</span>));</div><div class="line">        _control.x = _curPoint + _interval;</div><div class="line">        _control.y = _cur;</div><div class="line">        _end.x = _curPoint + _interval * <span class="number">1.5</span>;</div><div class="line">        _end.y = _curSupport;</div><div class="line">        _Y = getYValues(_start, _control, _end, _control.x);</div><div class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (_i &gt;= _dataGot.length - <span class="number">2</span>) &#123;</div><div class="line">        _Y = _cur;</div><div class="line">      &#125;</div><div class="line"></div><div class="line">      <span class="keyword">if</span> (_i &lt; _dataGot.length - <span class="number">2</span>) &#123;</div><div class="line">        _ctx.quadraticCurveTo(_curPoint + _interval, _cur,</div><div class="line">          _curPoint + _interval * <span class="number">1.5</span>, _curSupport);</div><div class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (_i &gt;= _dataGot.length - <span class="number">2</span>) &#123;</div><div class="line">        _ctx.quadraticCurveTo(_curPoint, getY(_i),</div><div class="line">          _curPoint + _interval, _cur);</div><div class="line">      &#125;</div><div class="line">      _curPoint += _interval;</div><div class="line">      _ctx.stroke();</div><div class="line"></div><div class="line">      _curPointT += _intervalT;</div><div class="line">      _ctx.fillText(data[_i + <span class="number">1</span>][<span class="number">1</span>] + <span class="string">"°"</span>, _curPointT,</div><div class="line">        _Y - setting.textOffSet);</div><div class="line">      _ctx.fillText(data[_i + <span class="number">1</span>][<span class="number">0</span>] + <span class="string">"°"</span>, _curPointT,</div><div class="line">        _Y + setting.textOffSet);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">draw_MAIN(canvas,data);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+  	</div>
+	  
+	  <div class="article-tags tags">
+		  
+        <a class="tag-link" href="/tags/Front-End/">Front-End</a><a class="tag-link" href="/tags/Javascript/">Javascript</a>
+      
+	  </div>
+	</section>
+</article>
+
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </main>
+    
+    <footer id="footer" class="clearfix">
+  
+  
+	<div class="search">
+	  <form name="searchform" id="searchform" class="searchform">
+	    <input type="text" id="search_input" class="search_input" placeholder="Looking for something?" />
+	    <button type="submit" class="search-bar-trigger">
+	      <span class="icon icon-search"></span>
+	    </button>
+	  </form>
+	</div>
+	
+
+	<div class="social-wrapper">
+  	
+      
+        <a href="https://github.com/lovin0730" class="social github"
+          target="_blank" rel="external">
+          <span class="icon icon-github"></span>
+        </a>
+      
+        <a href="https://twitter.com/xy610888871" class="social twitter"
+          target="_blank" rel="external">
+          <span class="icon icon-twitter"></span>
+        </a>
+      
+    
+  </div>
+  
+  <div>Theme <span class="codename">Typescript</span> designed by <a href="http://rakugaki.me/" target="_blank">Art Chen</a>.</div>
+  <div>&copy; <a href="/">Mirone</a></div>
+  
+</footer>
+
+
+    <script>setLoadingBarProgress(80);</script>
+    
+  </div>
+
+  <div id="modal-search">
+  <div class="modal">
+    <header class="modal-header clearfix">
+      <form id="modal-searchform" class="modal-searchform searchform" name="modalSearchform">
+        <input type="text" id="modal-searchinput" class="modal-input search_input" />
+        <button type="submit" class="search-bar-trigger">
+  	      <span class="icon icon-search"></span>
+  	    </button>
+      </form>
+      <a class="close">
+        <span class="icon icon-close"></span>
+      </a>
+      <div class="loading">
+        <div class="bar"></div>
+      </div>
+    </header>
+    <main class="modal-body">
+      <ul class="results ajax-content" id="modal-search-results">
+        
+      </ul>
+    </main>
+    <footer class="modal-footer ajax-content clearfix">
+      <div class="meta">
+        <strong class="range"></strong> of <strong class="total"></strong>
+      </div>
+      <div class="error"></div>
+      <a class="nav next">
+        <span class="text">NEXT</span>
+        <span class="icon icon-chevron-right"></span>
+      </a>
+      <a class="nav prev">
+        <span class="icon icon-chevron-left"></span>
+        <span class="text">PREV</span>
+      </a>
+    </footer>
+  </div>
+  <div class="overlay"></div>
+</div>
+  
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>')</script>
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+	var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+	var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+  var SEARCH_SERVICE = "hexo";
+</script>
+<script src="/js/min/search.min.js"></script>
+<script src="/js/min/app.min.js"></script>
+
+
+  <script>setLoadingBarProgress(100);</script>
+  
+</body>
+</html>
