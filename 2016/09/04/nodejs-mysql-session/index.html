@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>使用MySQL配合Node.js进行简单session校验 | Mirone</title>
+  <meta name="description" content="{{theme.description}}" />
+  <meta name="keywords" content="{{theme.keywords}}" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="pixiv-ID: 52610961
+
+session是web应用保持会话的一种相对安全有效又简单的方式，通常的做法是在每当客户端发起请求，服务端就会在返回的响应头信息中添加一个字段，同时将这个字段携带的信息记录在服务端。这样，当下次客户端发起请求的时候，服务端只要检查客户端携带的cookie，将它与服务端存储的数据做对比。就可以得知客户端当前状态，从而确保会话的连接了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用MySQL配合Node.js进行简单session校验">
+<meta property="og:url" content="http://lovin0730.github.io/2016/09/04/nodejs-mysql-session/index.html">
+<meta property="og:site_name" content="Mirone">
+<meta property="og:description" content="pixiv-ID: 52610961
+
+session是web应用保持会话的一种相对安全有效又简单的方式，通常的做法是在每当客户端发起请求，服务端就会在返回的响应头信息中添加一个字段，同时将这个字段携带的信息记录在服务端。这样，当下次客户端发起请求的时候，服务端只要检查客户端携带的cookie，将它与服务端存储的数据做对比。就可以得知客户端当前状态，从而确保会话的连接了。">
+<meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/nodejs-mysql-session-cover.jpg">
+<meta property="og:updated_time" content="2016-09-04T23:23:10.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用MySQL配合Node.js进行简单session校验">
+<meta name="twitter:description" content="pixiv-ID: 52610961
+
+session是web应用保持会话的一种相对安全有效又简单的方式，通常的做法是在每当客户端发起请求，服务端就会在返回的响应头信息中添加一个字段，同时将这个字段携带的信息记录在服务端。这样，当下次客户端发起请求的时候，服务端只要检查客户端携带的cookie，将它与服务端存储的数据做对比。就可以得知客户端当前状态，从而确保会话的连接了。">
+<meta name="twitter:image" content="http://oanr6klwj.bkt.clouddn.com/blog/nodejs-mysql-session-cover.jpg">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+	<script src="https://use.typekit.net/eyf3hir.js"></script>
+  <script>try{Typekit.load({ async: false });}catch(e){}</script>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+  <script>setLoadingBarProgress(20)</script>
+  
+  <div id="site-wrapper">
+    
+    <header id="header">
+	<div id="header-wrapper" class="clearfix">
+		<a id="logo" href="/">
+			<img src="/images/logo.png" />
+			<span id="site-desc">
+			  mirone keeps alive
+      </span>
+		</a>
+		<button id="site-nav-switch">
+	    <span class="icon icon-menu"></span>
+	  </button>
+	</div>
+	<aside id="site-menu">
+  	<nav>
+  		
+        <a href="/" class="nav-home nav">
+          Home
+        </a>
+      
+    </nav>
+	</aside>
+</header>
+    <script>setLoadingBarProgress(40);</script>
+    
+    <main id="main" role="main">
+      <article id="post-nodejs-mysql-session"
+  class="post article white-box article-type-post"
+  itemscope itemprop="blogPost">
+	<h2 class="title">
+  	<a href="/2016/09/04/nodejs-mysql-session/">
+    	使用MySQL配合Node.js进行简单session校验
+    </a>
+  </h2>
+	<time>
+	  9月 4, 2016
+	</time>
+	<section class="content">
+  	<div class="article-entry" itemprop="articleBody">
+    	<p><img src="http://oanr6klwj.bkt.clouddn.com/blog/nodejs-mysql-session-cover.jpg" alt="cover"></p>
+<blockquote>
+<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=52610961" target="_blank" rel="external"><em>pixiv-ID: 52610961</em></a></p>
+</blockquote>
+<p>session是web应用保持会话的一种相对安全有效又简单的方式，通常的做法是在每当客户端发起请求，服务端就会在返回的响应头信息中添加一个字段，同时将这个字段携带的信息记录在服务端。这样，当下次客户端发起请求的时候，服务端只要检查客户端携带的cookie，将它与服务端存储的数据做对比。就可以得知客户端当前状态，从而确保会话的连接了。</p>
+<a id="more"></a>
+<p>例如：当我第一次注册登录某网站，它记录了我的信息，并告诉我：“欢迎来到本网站！”，然后我不小心关掉了浏览器，再打开这个网站时惊喜的发现不用自己手动再登录一次了，但是当我三天没有访问它，它就会让我重新登录。这些就是通过session来完成的。</p>
+<p>实现一个session的方式分为三步：</p>
+<blockquote>
+<ul>
+<li>检查一个客户端请求是否携带约定字段</li>
+<li>若没带，说明是第一次访问。若带了，则判断是否超时。生成新的session。</li>
+<li>将session的识别字段写入cookie，返回客户端</li>
+</ul>
+</blockquote>
+<hr>
+<p>由于Node.js项目可能需要使用cluster，这导致session不能存储在缓存中，因此需要一个数据库，redis非常适合，但是由于项目刚好使用了MySQL，因此使用MySQL来存储session。在开始编写session之前，我们需要先封装几个简单的数据库操作。为此，我使用了一个node-mysql模块来帮助我进行工作。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> mysql = <span class="built_in">require</span>(<span class="string">'mysql'</span>);</div><div class="line"><span class="keyword">const</span> pool = mysql.createPool(&#123;</div><div class="line">  host: <span class="string">'yourhost'</span>,</div><div class="line">  user: <span class="string">'youruser'</span>,</div><div class="line">  database: <span class="string">'yourdb'</span>,</div><div class="line">  password: <span class="string">'*****'</span>,</div><div class="line">  port: <span class="string">'3306'</span>,</div><div class="line">  connectionLimit: <span class="number">100</span></div><div class="line">&#125;);</div><div class="line"><span class="keyword">const</span> createSchema = (schema, name) =&gt; &#123;</div><div class="line">  <span class="keyword">return</span> &#123;</div><div class="line">    name: name,</div><div class="line">    options: schema</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">const</span> sessionSchema = createSchema(</div><div class="line">  <span class="string">`(</span></div><div class="line">    id VARCHAR(100) primary key,</div><div class="line">    expire VARCHAR(50)</div><div class="line">  )`, <span class="string">'session'</span></div><div class="line">);</div><div class="line"><span class="keyword">const</span> operation = (connection, table) =&gt; &#123;</div><div class="line">  <span class="keyword">this</span>.createTable = (callback) =&gt; &#123;</div><div class="line">    <span class="keyword">const</span> action = <span class="string">'CREATE TABLE IF NOT EXISTS '</span> +</div><div class="line">      table.name + <span class="string">' '</span> + table.options;</div><div class="line">    connection.query(action, callback);</div><div class="line">  &#125;;</div><div class="line">  <span class="keyword">this</span>.dropTable = (callback) =&gt; &#123;</div><div class="line">    <span class="keyword">const</span> action =  <span class="string">'DROP TABLE '</span> + table.name;</div><div class="line">    connection.query(action, callback);</div><div class="line">  &#125;;</div><div class="line">  <span class="keyword">this</span>.insertItem = (data, callback) =&gt; &#123;</div><div class="line">    <span class="keyword">const</span> action =  <span class="string">'INSERT INTO '</span> + table.name + <span class="string">' SET ?'</span>;</div><div class="line">    connection.query(action, data, callback);</div><div class="line">  &#125;;</div><div class="line">  <span class="keyword">this</span>.selectById = (id, callback) =&gt; &#123;</div><div class="line">    <span class="keyword">const</span> action =  <span class="string">'SELECT * FROM '</span> + table.name + <span class="string">' WHERE id='</span> + pool.escape(id);</div><div class="line">    connection.query(action, callback);</div><div class="line">  &#125;;</div><div class="line">  <span class="keyword">this</span>.updateById = (id, data, callback) =&gt; &#123;</div><div class="line">    <span class="keyword">const</span> action = <span class="string">'UPDATE '</span> + table.name + <span class="string">' SET ? WHERE id='</span> + pool.escape(id);</div><div class="line">    connection.query(action, data, callback);</div><div class="line">  &#125;;</div><div class="line">  <span class="keyword">this</span>.deleteById = (id, callback) =&gt; &#123;</div><div class="line">    <span class="keyword">const</span> action = <span class="string">'DELETE FROM '</span> + table.name + <span class="string">' WHERE id='</span> + pool.escape(id);</div><div class="line">    connection.query(action, callback);</div><div class="line">  &#125;;</div><div class="line">  <span class="keyword">this</span>.release = () =&gt; &#123;</div><div class="line">    connection.release();</div><div class="line">  &#125;;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">const</span> connectPool = (callback, table) =&gt; &#123;</div><div class="line">  pool.getConnection((err, connection) =&gt; &#123;</div><div class="line">    <span class="keyword">if</span>(err) &#123;</div><div class="line">      <span class="built_in">console</span>.log(<span class="string">'[query] - :'</span> + err);</div><div class="line">      <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">'[connection connect] succeed!'</span>);</div><div class="line">    <span class="keyword">const</span> connect = operation(connection, table);</div><div class="line">    callback(connect);</div><div class="line">  &#125;);</div><div class="line">&#125;;</div><div class="line"><span class="keyword">const</span> defaultCallback = (err, result) =&gt; &#123;</div><div class="line">  <span class="keyword">if</span> (err) &#123;</div><div class="line">    <span class="built_in">console</span>.log(err);</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="built_in">console</span>.log(result);</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">const</span> initTable = () =&gt; &#123;</div><div class="line">  <span class="keyword">const</span> createSessionTable = connectPool((connect) =&gt; &#123;</div><div class="line">    connect.createTable(defaultCallback);</div><div class="line">    connect.release();</div><div class="line">  &#125;, sessionSchema);</div><div class="line">&#125;;</div><div class="line"><span class="keyword">const</span> manager = (mode) =&gt; &#123;</div><div class="line">  <span class="keyword">const</span> common = (callback) =&gt; &#123;</div><div class="line">    <span class="keyword">return</span> connectPool((connect) =&gt; &#123;</div><div class="line">      callback(connect);</div><div class="line">      connect.release();</div><div class="line">    &#125;, mode);</div><div class="line">  &#125;;</div><div class="line">  <span class="keyword">return</span> &#123;</div><div class="line">    create: () =&gt; &#123;</div><div class="line">      common((connect) =&gt; &#123;</div><div class="line">        connect.createTable(defaultCallback);</div><div class="line">      &#125;);</div><div class="line">    &#125;,</div><div class="line">    add: (data) =&gt; &#123;</div><div class="line">      common((connect) =&gt; &#123;</div><div class="line">        connect.insertItem(data, defaultCallback);</div><div class="line">      &#125;);</div><div class="line">    &#125;,</div><div class="line">    <span class="keyword">delete</span>: (id) =&gt; &#123;</div><div class="line">      common((connect) =&gt; &#123;</div><div class="line">        connect.deleteById(id, defaultCallback);</div><div class="line">      &#125;);</div><div class="line">    &#125;,</div><div class="line">    get: (id, callback) =&gt; &#123;</div><div class="line">      common((connect) =&gt; &#123;</div><div class="line">        connect.selectById(id, (err, result)=&gt;&#123;</div><div class="line">          <span class="keyword">if</span> (err) &#123;</div><div class="line">            <span class="built_in">console</span>.log(err);</div><div class="line">          &#125; <span class="keyword">else</span> &#123;</div><div class="line">            callback(result);</div><div class="line">          &#125;</div><div class="line">        &#125;);</div><div class="line">      &#125;);</div><div class="line">    &#125;,</div><div class="line">    update: (data) =&gt; &#123;</div><div class="line">      common((connect) =&gt; &#123;</div><div class="line">        connect.updateById(data.id, data, defaultCallback);</div><div class="line">      &#125;);</div><div class="line">    &#125;,</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">initTable();</div><div class="line"><span class="keyword">const</span> sessionManager = manager(sessionSchema);</div></pre></td></tr></table></figure></p>
+<p>这样我们就封装好了一个sessionManager，用来对session表进行增删查改的操作，这样封装的好处是如果有了新的table，只要在原代码的基础上新增相关schema即可，不需要修改和删除代码。</p>
+<hr>
+<p>接下来我们可以进行服务端session校验的编写了。</p>
+<blockquote>
+<ul>
+<li>确定session的时效<code>EXPIRES</code>和约定字段<code>KEY</code>，并用<code>parseCookie</code>解析请求中的cookie。</li>
+<li>使用<code>hackHead</code>方法改写response方法使其能够携带session。</li>
+<li>使用两个promise<code>checkExist</code>和<code>sessionMiddleWare</code>来让异步操作更有条理，对session是否存在进行处理。</li>
+<li>把后续操作放在<code>handler</code>中进行，这样就可以保证客户端是和我们保持通信的状态了。</li>
+</ul>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</div><div class="line"><span class="keyword">const</span> KEY = <span class="string">'session_id'</span>;</div><div class="line"><span class="keyword">const</span> EXPIRES = <span class="number">20</span> * <span class="number">60</span> * <span class="number">1000</span>;</div><div class="line"><span class="keyword">const</span> generate = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> session = &#123;&#125;;</div><div class="line">  session.id = (<span class="keyword">new</span> <span class="built_in">Date</span>()).getTime() + <span class="built_in">Math</span>.random().toFixed(<span class="number">2</span>);</div><div class="line">  session.expire = (<span class="keyword">new</span> <span class="built_in">Date</span>()).getTime() + EXPIRES;</div><div class="line">  sessionManager.add(session);</div><div class="line">  <span class="keyword">return</span> session;</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> checkExist = (id) =&gt; &#123;</div><div class="line">  <span class="keyword">var</span> promise = <span class="keyword">new</span> <span class="built_in">Promise</span>((resolve, reject) =&gt; &#123;</div><div class="line">    sessionManager.get(id, (session) =&gt; &#123;</div><div class="line">      <span class="keyword">if</span> (session) &#123;</div><div class="line">        resolve(session);</div><div class="line">      &#125;</div><div class="line">    &#125;);</div><div class="line">  &#125;);</div><div class="line">  <span class="keyword">return</span> promise;</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> parseCookie = (req) =&gt; &#123;</div><div class="line">  <span class="keyword">if</span> (req.headers.cookie)&#123;</div><div class="line">    <span class="keyword">let</span> cookies = &#123;&#125;;</div><div class="line">    req.headers.cookie.split(<span class="string">';'</span>).forEach((cookie) =&gt; &#123;</div><div class="line">      <span class="keyword">let</span> parts = cookie.split(<span class="string">'='</span>);</div><div class="line">      cookies[ parts[<span class="number">0</span>].trim() ] = ( parts[<span class="number">1</span>] || <span class="string">''</span>).trim();</div><div class="line">    &#125;)</div><div class="line">    <span class="keyword">return</span> cookies;</div><div class="line">  &#125; <span class="keyword">else</span> &#123;</div><div class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> hackHead = (sessions, req, res) =&gt; &#123;</div><div class="line">  <span class="keyword">var</span> writeHead = res.writeHead;</div><div class="line">  res.writeHead = (status, headers) =&gt; &#123;</div><div class="line">    <span class="keyword">let</span> cookies = req.headers.cookie;</div><div class="line">    <span class="keyword">let</span> session = KEY + <span class="string">'='</span> + sessions.id;</div><div class="line">    cookies = <span class="built_in">Array</span>.isArray(cookies) ?</div><div class="line">      cookies.concat(session) :</div><div class="line">      [cookies, session];</div><div class="line">    res.setHeader(<span class="string">'Set-Cookie'</span>, cookies);</div><div class="line">    res.writeHead = writeHead;</div><div class="line">    <span class="keyword">return</span> res.writeHead(status, headers);</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">return</span> res.writeHead;</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> sessionMiddleWare = (req, res) =&gt; &#123;</div><div class="line">  <span class="keyword">var</span> promise = <span class="keyword">new</span> <span class="built_in">Promise</span>((resolve, reject) =&gt; &#123;</div><div class="line">    <span class="keyword">const</span> cookies = parseCookie(req);</div><div class="line">    <span class="keyword">if</span>(!cookies || !cookies[KEY]) &#123;</div><div class="line">      <span class="keyword">const</span> session = generate(user);</div><div class="line">      res.writeHead = hackHead(session, req, res);</div><div class="line">      <span class="keyword">const</span> output = [req, res];</div><div class="line">      resolve(output);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">      checkExist(cookies[KEY]).then((session) =&gt; &#123;</div><div class="line">        <span class="keyword">let</span> newSession;</div><div class="line">        <span class="keyword">if</span> (session[<span class="number">0</span>])&#123;</div><div class="line">          session = session[<span class="number">0</span>];</div><div class="line">          <span class="keyword">if</span> (session.expire &gt; (<span class="keyword">new</span> <span class="built_in">Date</span>()).getTime()) &#123;</div><div class="line">            newSession = session;</div><div class="line">            newSession.expire = (<span class="keyword">new</span> <span class="built_in">Date</span>()).getTime() + EXPIRES;</div><div class="line">            manager.update(newSession);</div><div class="line">          &#125; <span class="keyword">else</span> &#123;</div><div class="line">            manager.delete(session.id);</div><div class="line">            newSession = generate(user);</div><div class="line">          &#125;</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">          newSession = generate(user);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> newSession;</div><div class="line">      &#125;).then((session) =&gt; &#123;</div><div class="line">        res.writeHead = hackHead(session, req, res);</div><div class="line">        <span class="keyword">const</span> output = [req, res];</div><div class="line">        resolve(output);</div><div class="line">      &#125;);</div><div class="line">    &#125;</div><div class="line">  &#125;);</div><div class="line">  <span class="keyword">return</span> promise;</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> checkSession = (req, res, handler) =&gt; &#123;</div><div class="line">  sessionMiddleWare(req, res).then((output) =&gt; &#123;</div><div class="line">    handler(output[<span class="number">0</span>], output[<span class="number">1</span>]);</div><div class="line">  &#125;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+  	</div>
+	  
+	  <div class="article-tags tags">
+		  
+        <a class="tag-link" href="/tags/Back-End/">Back-End</a><a class="tag-link" href="/tags/Node-js/">Node.js</a>
+      
+	  </div>
+	</section>
+</article>
+
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </main>
+    
+    <footer id="footer" class="clearfix">
+  
+  
+	<div class="search">
+	  <form name="searchform" id="searchform" class="searchform">
+	    <input type="text" id="search_input" class="search_input" placeholder="Looking for something?" />
+	    <button type="submit" class="search-bar-trigger">
+	      <span class="icon icon-search"></span>
+	    </button>
+	  </form>
+	</div>
+	
+
+	<div class="social-wrapper">
+  	
+      
+        <a href="https://github.com/lovin0730" class="social github"
+          target="_blank" rel="external">
+          <span class="icon icon-github"></span>
+        </a>
+      
+        <a href="https://twitter.com/xy610888871" class="social twitter"
+          target="_blank" rel="external">
+          <span class="icon icon-twitter"></span>
+        </a>
+      
+    
+  </div>
+  
+  <div>Theme <span class="codename">Typescript</span> designed by <a href="http://rakugaki.me/" target="_blank">Art Chen</a>.</div>
+  <div>&copy; <a href="/">Mirone</a></div>
+  
+</footer>
+
+
+    <script>setLoadingBarProgress(80);</script>
+    
+  </div>
+
+  <div id="modal-search">
+  <div class="modal">
+    <header class="modal-header clearfix">
+      <form id="modal-searchform" class="modal-searchform searchform" name="modalSearchform">
+        <input type="text" id="modal-searchinput" class="modal-input search_input" />
+        <button type="submit" class="search-bar-trigger">
+  	      <span class="icon icon-search"></span>
+  	    </button>
+      </form>
+      <a class="close">
+        <span class="icon icon-close"></span>
+      </a>
+      <div class="loading">
+        <div class="bar"></div>
+      </div>
+    </header>
+    <main class="modal-body">
+      <ul class="results ajax-content" id="modal-search-results">
+        
+      </ul>
+    </main>
+    <footer class="modal-footer ajax-content clearfix">
+      <div class="meta">
+        <strong class="range"></strong> of <strong class="total"></strong>
+      </div>
+      <div class="error"></div>
+      <a class="nav next">
+        <span class="text">NEXT</span>
+        <span class="icon icon-chevron-right"></span>
+      </a>
+      <a class="nav prev">
+        <span class="icon icon-chevron-left"></span>
+        <span class="text">PREV</span>
+      </a>
+    </footer>
+  </div>
+  <div class="overlay"></div>
+</div>
+  
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>')</script>
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+	var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+	var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+  var SEARCH_SERVICE = "hexo";
+</script>
+<script src="/js/min/search.min.js"></script>
+<script src="/js/min/app.min.js"></script>
+
+
+  <script>setLoadingBarProgress(100);</script>
+  
+</body>
+</html>
