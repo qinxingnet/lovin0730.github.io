@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>JavaScript异步编程进化论 | Mirone</title>
+  <meta name="description" content="{{theme.description}}" />
+  <meta name="keywords" content="{{theme.keywords}}" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="pixiv-ID: 16810195
+
+众所周知，JavaScript的执行环境是单线程的，这意味着如果有很多任务，就只能排队一个一个执行。请看下面的例子。12345console.log(1);var X = 100000;for(let i = 0; i &amp;lt; X; i++) &amp;#123;&amp;#125;console.log(2);
+随着X的增大，打印1和2之间出现的时间间隔也在明显变长">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript异步编程进化论">
+<meta property="og:url" content="http://lovin0730.github.io/2016/09/07/js-async/index.html">
+<meta property="og:site_name" content="Mirone">
+<meta property="og:description" content="pixiv-ID: 16810195
+
+众所周知，JavaScript的执行环境是单线程的，这意味着如果有很多任务，就只能排队一个一个执行。请看下面的例子。12345console.log(1);var X = 100000;for(let i = 0; i &amp;lt; X; i++) &amp;#123;&amp;#125;console.log(2);
+随着X的增大，打印1和2之间出现的时间间隔也在明显变长">
+<meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/js-async-cover.jpg">
+<meta property="og:updated_time" content="2016-09-07T17:36:43.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript异步编程进化论">
+<meta name="twitter:description" content="pixiv-ID: 16810195
+
+众所周知，JavaScript的执行环境是单线程的，这意味着如果有很多任务，就只能排队一个一个执行。请看下面的例子。12345console.log(1);var X = 100000;for(let i = 0; i &amp;lt; X; i++) &amp;#123;&amp;#125;console.log(2);
+随着X的增大，打印1和2之间出现的时间间隔也在明显变长">
+<meta name="twitter:image" content="http://oanr6klwj.bkt.clouddn.com/blog/js-async-cover.jpg">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+	<script src="https://use.typekit.net/eyf3hir.js"></script>
+  <script>try{Typekit.load({ async: false });}catch(e){}</script>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+  <script>setLoadingBarProgress(20)</script>
+  
+  <div id="site-wrapper">
+    
+    <header id="header">
+	<div id="header-wrapper" class="clearfix">
+		<a id="logo" href="/">
+			<img src="/images/logo.png" />
+			<span id="site-desc">
+			  mirone keeps alive
+      </span>
+		</a>
+		<button id="site-nav-switch">
+	    <span class="icon icon-menu"></span>
+	  </button>
+	</div>
+	<aside id="site-menu">
+  	<nav>
+  		
+        <a href="/" class="nav-home nav">
+          Home
+        </a>
+      
+    </nav>
+	</aside>
+</header>
+    <script>setLoadingBarProgress(40);</script>
+    
+    <main id="main" role="main">
+      <article id="post-js-async"
+  class="post article white-box article-type-post"
+  itemscope itemprop="blogPost">
+	<h2 class="title">
+  	<a href="/2016/09/07/js-async/">
+    	JavaScript异步编程进化论
+    </a>
+  </h2>
+	<time>
+	  9月 7, 2016
+	</time>
+	<section class="content">
+  	<div class="article-entry" itemprop="articleBody">
+    	<p><img src="http://oanr6klwj.bkt.clouddn.com/blog/js-async-cover.jpg" alt="cover"></p>
+<blockquote>
+<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=16810195" target="_blank" rel="external"><em>pixiv-ID: 16810195</em></a></p>
+</blockquote>
+<p>众所周知，JavaScript的执行环境是单线程的，这意味着如果有很多任务，就只能排队一个一个执行。请看下面的例子。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="number">1</span>);</div><div class="line"><span class="keyword">var</span> X = <span class="number">100000</span>;</div><div class="line"><span class="keyword">for</span>(<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; X; i++) &#123;</div><div class="line">&#125;</div><div class="line"><span class="built_in">console</span>.log(<span class="number">2</span>);</div></pre></td></tr></table></figure></p>
+<p>随着X的增大，打印1和2之间出现的时间间隔也在明显变长。对此，JavaScript采取异步来处理这种问题。<br><a id="more"></a><br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="number">1</span>);</div><div class="line">setTimeout(() =&gt; &#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="number">2</span>)</div><div class="line">&#125;, <span class="number">2000</span>);</div><div class="line"><span class="built_in">console</span>.log(<span class="number">3</span>)</div></pre></td></tr></table></figure></p>
+<p>事实上，打印的结果是1、3、2，setTimeout是一个典型的异步操作，所以JavaScript引擎执行到它时，会让它异步执行，而自己继续执行后面的任务，等到异步操作有了结果，再进行处理。<br>但是异步编程的方法是值得讨论的，下面我用Node.js环境来进行后续的演示。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</div><div class="line">http.createServer((req, res) =&gt; &#123;</div><div class="line">  res.writeHead(<span class="number">200</span>, &#123;</div><div class="line">    <span class="string">'Content-Type'</span>: <span class="string">'text/plain'</span></div><div class="line">  &#125;);</div><div class="line">  <span class="comment">//TODO</span></div><div class="line">&#125;).listen(<span class="number">3000</span>, <span class="built_in">console</span>.log(<span class="string">'callback running at localhost:3000'</span>));</div></pre></td></tr></table></figure></p>
+<p>我创建了一个本地服务器，<strong>后面书写的所有代码都放在注释为<code>TODO</code>的位置执行</strong>。</p>
+<hr>
+<h2 id="Callback"><a href="#Callback" class="headerlink" title="Callback"></a>Callback</h2><p>早期的大多数异步操作都是通过回调函数来完成的。下面我们用delay函数来模拟异步的数据获取(就像客户端通过Ajax或是服务端操作数据库所获取的数据)。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> delay = (msg, callback) =&gt; &#123;</div><div class="line">  setTimeout(() =&gt; &#123;</div><div class="line">    callback(msg + <span class="string">'\n'</span>);</div><div class="line">  &#125;, <span class="number">0</span>);</div><div class="line">&#125;</div><div class="line">delay(<span class="string">'delay begin'</span>, (data) =&gt; &#123;</div><div class="line">  res.write(data);</div><div class="line">  delay(<span class="string">'delay end'</span>, (data) =&gt; &#123;</div><div class="line">    res.write(data);</div><div class="line">    delay(<span class="string">'callback work'</span>, (data) =&gt; &#123;</div><div class="line">      res.write(data);</div><div class="line">      delay(<span class="string">'done'</span>, (data) =&gt; &#123;</div><div class="line">        res.write(data);</div><div class="line">        res.end();</div><div class="line">      &#125;)</div><div class="line">    &#125;)</div><div class="line">  &#125;)</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>我们发现问题的所在了，由于数据只能在回调函数内进行使用和操作，这导致了冗长的回调函数的出现，而且非常难以阅读。这就是著名的callback hell，对于需要连续进行异步操作的应用，这样的实现方案无疑是维护者的噩梦。</p>
+<hr>
+<h2 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h2><p>因此，Promise应运而生，它改变了写法。请看下面的代码。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> delay = (msg) =&gt; &#123;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>((resolve) =&gt; &#123;</div><div class="line">    setTimeout(() =&gt; &#123;</div><div class="line">      resolve(msg + <span class="string">'\n'</span>);</div><div class="line">    &#125;, <span class="number">0</span>);</div><div class="line">  &#125;);</div><div class="line">&#125;</div><div class="line">delay(<span class="string">'delay begin'</span>).then((data) =&gt; &#123;</div><div class="line">  res.write(data);</div><div class="line">&#125;).then(() =&gt; &#123;</div><div class="line">  <span class="keyword">return</span> delay(<span class="string">'delay end'</span>);</div><div class="line">&#125;).then((data) =&gt; &#123;</div><div class="line">  res.write(data);</div><div class="line">&#125;).then(() =&gt; &#123;</div><div class="line">  <span class="keyword">return</span> delay(<span class="string">'promise work'</span>);</div><div class="line">&#125;).then((data) =&gt; &#123;</div><div class="line">  res.write(data);</div><div class="line">&#125;).then(() =&gt; &#123;</div><div class="line">  <span class="keyword">return</span> delay(<span class="string">'done'</span>);</div><div class="line">&#125;).then((data) =&gt; &#123;</div><div class="line">  res.write(data);</div><div class="line">  res.end();</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>这样，我们就能通过链式调用来书写异步操作，任务先后顺序清晰易懂。只是，这份代码对于维护者显然也不是那么友好，要进行修改，就要对长长的链式调用进行阅读和修改。在度过jQuery时代时，这种写法的弊端已经暴漏无疑。</p>
+<hr>
+<h2 id="Generator"><a href="#Generator" class="headerlink" title="Generator"></a>Generator</h2><p>ES6为我们提供了更新的异步操作思路，那就是使用Generator函数。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> delay = (msg) =&gt; &#123;</div><div class="line">  setTimeout(() =&gt; &#123;</div><div class="line">    to.next(msg + <span class="string">'\n'</span>);</div><div class="line">  &#125;, <span class="number">100</span>);</div><div class="line">&#125;</div><div class="line"><span class="function"><span class="keyword">function</span>* <span class="title">todo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">const</span> begin = <span class="keyword">yield</span> delay(<span class="string">'delay begin'</span>);</div><div class="line">  res.write(begin);</div><div class="line">  <span class="keyword">const</span> end = <span class="keyword">yield</span> delay(<span class="string">'delay end'</span>);</div><div class="line">  res.write(end);</div><div class="line">  <span class="keyword">const</span> generator = <span class="keyword">yield</span> delay(<span class="string">'generator work'</span>);</div><div class="line">  res.write(generator);</div><div class="line">  <span class="keyword">const</span> done = <span class="keyword">yield</span> delay(<span class="string">'done'</span>);</div><div class="line">  res.write(done);</div><div class="line">  res.end();</div><div class="line">&#125;</div><div class="line"><span class="keyword">let</span> to = todo();</div><div class="line">to.next();</div></pre></td></tr></table></figure></p>
+<p>我们可以通过在函数声明时加上星号创建Generator函数。它允许函数在执行过程中退出和重新进入，且重新进入时的环境（例如变量等）可以继续使用。<br>调用Generator并不会立即执行，而是返回一个Iterator对象，每次调用这个对象的next方法，它会执行到第一个yield表达式之前，这个表达式定义了返回值以及返回状态。<br>其实，Generator想做的就是<strong>让异步编程越来越像同步编程</strong>。上述代码中我们发现它确实达到了目的，但是它也有显而易见的问题，那就是我们在书写异步操作时总要牢记什么时候要调用next，且异步操作和调用Generator函数生成的实例总要放在同一作用域，耦合度很高，再加上第一次的next方法要手动调用，因此这一方案注定还有很大的提升空间。</p>
+<hr>
+<h2 id="Thunk-Generator"><a href="#Thunk-Generator" class="headerlink" title="Thunk Generator"></a>Thunk Generator</h2><p>Thunk函数是一种高阶函数，它支持我们将一个<strong>带有回调函数作为参数的多参函数转化为单参版本</strong>。举个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//带回调函数作为参数的多参函数</span></div><div class="line"><span class="keyword">const</span> delay = (msg, callback) =&gt; &#123;</div><div class="line">  setTimeout(() =&gt; &#123;</div><div class="line">    callback(msg);</div><div class="line">  &#125;, <span class="number">0</span>);</div><div class="line">&#125;;</div><div class="line"><span class="comment">//常规调用</span></div><div class="line">delay(<span class="string">'your msg'</span>, () =&gt; &#123;</div><div class="line">  <span class="comment">//whatever</span></div><div class="line">&#125;);</div><div class="line"><span class="comment">//Thunk化</span></div><div class="line"><span class="keyword">const</span> delay_thunk = Thunk(delay);</div><div class="line"><span class="comment">//Thunk化之后的调用</span></div><div class="line">delay(<span class="string">'your msg'</span>)(() =&gt; &#123;</div><div class="line">  <span class="comment">//whatever</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>如果我们使用Thunk化之后的delay函数，那么就有希望把generator函数中执行的异步函数和next方法分离开来，并制造出一个generator自动执行器。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> Thunk = (f) =&gt; &#123;</div><div class="line">  <span class="keyword">return</span> (...args) =&gt; &#123;</div><div class="line">    <span class="keyword">return</span> (callback) =&gt; &#123;</div><div class="line">      <span class="keyword">return</span> f.call(<span class="keyword">this</span>, ...args, callback);</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"><span class="keyword">const</span> delay = (msg, callback) =&gt; &#123;</div><div class="line">  setTimeout(() =&gt; &#123;</div><div class="line">    callback(msg);</div><div class="line">  &#125;, <span class="number">0</span>);</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> runG = (g) =&gt; &#123;</div><div class="line">  <span class="keyword">const</span> it = g();</div><div class="line">  !<span class="function"><span class="keyword">function</span> <span class="title">next</span>(<span class="params">data</span>)</span>&#123;</div><div class="line">    <span class="keyword">let</span> result = it.next(data);</div><div class="line">    <span class="keyword">if</span> (!result.done) &#123;</div><div class="line">      result.value(next);</div><div class="line">    &#125;</div><div class="line">  &#125;();</div><div class="line">&#125;;</div><div class="line"><span class="keyword">const</span> td = Thunk(delay);</div><div class="line"><span class="keyword">const</span> todo = <span class="function"><span class="keyword">function</span>* (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">const</span> begin = <span class="keyword">yield</span> td(<span class="string">'delay begin'</span>);</div><div class="line">  <span class="keyword">const</span> end = <span class="keyword">yield</span> td(<span class="string">'delay end'</span>);</div><div class="line">  <span class="keyword">const</span> gValue = <span class="keyword">yield</span> td(<span class="string">'generator thunk value'</span>);</div><div class="line">  <span class="keyword">const</span> done = <span class="keyword">yield</span> td(<span class="string">'done'</span>);</div><div class="line">  write(begin);</div><div class="line">  write(end);</div><div class="line">  write(gValue);</div><div class="line">  write(done);</div><div class="line">  res.end();</div><div class="line">&#125;</div><div class="line">runG(todo);</div></pre></td></tr></table></figure></p>
+<p>也许最难理解的就是自动处理generator的函数<code>runG</code>了，这个函数其实通过递归层层调用generator函数的next方法。<br>这非常有意义，因为这下异步操作真正做到了将结果分离出来供外部进行使用和操作。</p>
+<hr>
+<h2 id="Promise-Generator"><a href="#Promise-Generator" class="headerlink" title="Promise Generator"></a>Promise Generator</h2><p>如果不想借助thunk函数，我们还可以使用promise，它还免去了我们手写<code>Thunk</code>函数的麻烦，请看代码。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> delay = (msg) =&gt; &#123;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>((resolve) =&gt; &#123;</div><div class="line">    setTimeout(() =&gt; &#123;</div><div class="line">      resolve(msg);</div><div class="line">    &#125;, <span class="number">0</span>);</div><div class="line">  &#125;);</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> runG = (g) =&gt; &#123;</div><div class="line">  <span class="keyword">const</span> it = g();</div><div class="line">  !<span class="function"><span class="keyword">function</span> <span class="title">next</span>(<span class="params">data</span>)</span>&#123;</div><div class="line">    <span class="keyword">let</span> result = it.next(data);</div><div class="line">    <span class="keyword">if</span> (!result.done) &#123;</div><div class="line">      result.value.then((data) =&gt; &#123;</div><div class="line">        next(data);</div><div class="line">      &#125;);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">      <span class="keyword">return</span> result.value;</div><div class="line">    &#125;</div><div class="line">  &#125;();</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> todo = <span class="function"><span class="keyword">function</span>* (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">const</span> begin = <span class="keyword">yield</span> delay(<span class="string">'delay begin'</span>);</div><div class="line">  <span class="keyword">const</span> end = <span class="keyword">yield</span> delay(<span class="string">'delay end'</span>);</div><div class="line">  <span class="keyword">const</span> gValue = <span class="keyword">yield</span> delay(<span class="string">'generator thunk value'</span>);</div><div class="line">  <span class="keyword">const</span> done = <span class="keyword">yield</span> delay(<span class="string">'done'</span>);</div><div class="line">  write(begin);</div><div class="line">  write(end);</div><div class="line">  write(gValue);</div><div class="line">  write(done);</div><div class="line">  res.end();</div><div class="line">&#125;</div><div class="line">runG(todo);</div></pre></td></tr></table></figure></p>
+<hr>
+<h2 id="Async"><a href="#Async" class="headerlink" title="Async"></a>Async</h2><p>ES7提出了新的异步方案async，不过babel之类的转换器已经支持了它，async其实就是改变了generator函数的api，同时<strong>内置了自动执行函数</strong>。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> delay = (msg) =&gt; &#123;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>((resolve) =&gt; &#123;</div><div class="line">    setTimeout(() =&gt; &#123;</div><div class="line">      resolve(msg);</div><div class="line">    &#125;, <span class="number">0</span>);</div><div class="line">  &#125;);</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> write = (pass) =&gt; &#123;</div><div class="line">  res.write(pass + <span class="string">'\n'</span>);</div><div class="line">&#125;</div><div class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">todo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">const</span> begin = <span class="keyword">await</span> delay(<span class="string">'delay begin'</span>);</div><div class="line">  <span class="keyword">const</span> end = <span class="keyword">await</span> delay(<span class="string">'delay end'</span>);</div><div class="line">  <span class="keyword">const</span> gValue = <span class="keyword">await</span> delay(<span class="string">'generator thunk value'</span>);</div><div class="line">  <span class="keyword">const</span> done = <span class="keyword">await</span> delay(<span class="string">'done'</span>);</div><div class="line">  write(begin);</div><div class="line">  write(end);</div><div class="line">  write(gValue);</div><div class="line">  write(done);</div><div class="line">  res.end();</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> autoRun = todo();</div></pre></td></tr></table></figure></p>
+<p>可以看到，就是将声明方式去掉了星号，在函数前加上了<code>async</code>前缀，并将<code>yield</code>替换为<code>await</code>，执行时，只需要进行一次调用，就能自动执行内部函数了。<br>总之，异步操作正变得越来越好理解，好使用，好维护，它进步的方向就是变得越来越像同步操作。</p>
+
+  	</div>
+	  
+	  <div class="article-tags tags">
+		  
+        <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+      
+	  </div>
+	</section>
+</article>
+
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </main>
+    
+    <footer id="footer" class="clearfix">
+  
+  
+	<div class="search">
+	  <form name="searchform" id="searchform" class="searchform">
+	    <input type="text" id="search_input" class="search_input" placeholder="Looking for something?" />
+	    <button type="submit" class="search-bar-trigger">
+	      <span class="icon icon-search"></span>
+	    </button>
+	  </form>
+	</div>
+	
+
+	<div class="social-wrapper">
+  	
+      
+        <a href="https://github.com/lovin0730" class="social github"
+          target="_blank" rel="external">
+          <span class="icon icon-github"></span>
+        </a>
+      
+        <a href="https://twitter.com/xy610888871" class="social twitter"
+          target="_blank" rel="external">
+          <span class="icon icon-twitter"></span>
+        </a>
+      
+    
+  </div>
+  
+  <div>Theme <span class="codename">Typescript</span> designed by <a href="http://rakugaki.me/" target="_blank">Art Chen</a>.</div>
+  <div>&copy; <a href="/">Mirone</a></div>
+  
+</footer>
+
+
+    <script>setLoadingBarProgress(80);</script>
+    
+  </div>
+
+  <div id="modal-search">
+  <div class="modal">
+    <header class="modal-header clearfix">
+      <form id="modal-searchform" class="modal-searchform searchform" name="modalSearchform">
+        <input type="text" id="modal-searchinput" class="modal-input search_input" />
+        <button type="submit" class="search-bar-trigger">
+  	      <span class="icon icon-search"></span>
+  	    </button>
+      </form>
+      <a class="close">
+        <span class="icon icon-close"></span>
+      </a>
+      <div class="loading">
+        <div class="bar"></div>
+      </div>
+    </header>
+    <main class="modal-body">
+      <ul class="results ajax-content" id="modal-search-results">
+        
+      </ul>
+    </main>
+    <footer class="modal-footer ajax-content clearfix">
+      <div class="meta">
+        <strong class="range"></strong> of <strong class="total"></strong>
+      </div>
+      <div class="error"></div>
+      <a class="nav next">
+        <span class="text">NEXT</span>
+        <span class="icon icon-chevron-right"></span>
+      </a>
+      <a class="nav prev">
+        <span class="icon icon-chevron-left"></span>
+        <span class="text">PREV</span>
+      </a>
+    </footer>
+  </div>
+  <div class="overlay"></div>
+</div>
+  
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>')</script>
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+	var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+	var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+  var SEARCH_SERVICE = "hexo";
+</script>
+<script src="/js/min/search.min.js"></script>
+<script src="/js/min/app.min.js"></script>
+
+
+  <script>setLoadingBarProgress(100);</script>
+  
+</body>
+</html>
