@@ -23,7 +23,7 @@
 众所周知，JavaScript的执行环境是单线程的，这意味着如果有很多任务，就只能排队一个一个执行。请看下面的例子。12345console.log(1);var X = 100000;for(let i = 0; i &amp;lt; X; i++) &amp;#123;&amp;#125;console.log(2);
 随着X的增大，打印1和2之间出现的时间间隔也在明显变长">
 <meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/js-async-cover.jpg">
-<meta property="og:updated_time" content="2016-09-08T04:24:42.000Z">
+<meta property="og:updated_time" content="2016-09-08T14:08:05.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JavaScript异步编程进化论">
 <meta name="twitter:description" content="pixiv-ID: 16810195
@@ -121,7 +121,14 @@
 <h2 id="Async"><a href="#Async" class="headerlink" title="Async"></a>Async</h2><p>ES7提出了新的异步方案async，不过babel之类的转换器已经支持了它，async其实就是改变了generator函数的api，同时<strong>内置了自动执行函数</strong>。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">const</span> delay = (msg) =&gt; &#123;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>((resolve) =&gt; &#123;</div><div class="line">    setTimeout(() =&gt; &#123;</div><div class="line">      resolve(msg);</div><div class="line">    &#125;, <span class="number">0</span>);</div><div class="line">  &#125;);</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> write = (pass) =&gt; &#123;</div><div class="line">  res.write(pass + <span class="string">'\n'</span>);</div><div class="line">&#125;</div><div class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">todo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">const</span> begin = <span class="keyword">await</span> delay(<span class="string">'delay begin'</span>);</div><div class="line">  <span class="keyword">const</span> end = <span class="keyword">await</span> delay(<span class="string">'delay end'</span>);</div><div class="line">  <span class="keyword">const</span> gValue = <span class="keyword">await</span> delay(<span class="string">'generator thunk value'</span>);</div><div class="line">  <span class="keyword">const</span> done = <span class="keyword">await</span> delay(<span class="string">'done'</span>);</div><div class="line">  write(begin);</div><div class="line">  write(end);</div><div class="line">  write(gValue);</div><div class="line">  write(done);</div><div class="line">  res.end();</div><div class="line">&#125;</div><div class="line"><span class="keyword">const</span> autoRun = todo();</div></pre></td></tr></table></figure></p>
 <p>可以看到，就是将声明方式去掉了星号，在函数前加上了<code>async</code>前缀，并将<code>yield</code>替换为<code>await</code>，执行时，只需要进行一次调用，就能自动执行内部函数了。</p>
 <hr>
-<p>总之，异步操作正变得越来越好理解，好使用，好维护，它目前进步的方向是变得越来越像同步操作。</p>
+<p>总之，异步操作正变得越来越好理解，好使用，好维护，它目前进步的方向是变得越来越像同步操作。<br>如果你想了解更多：</p>
+<ul>
+<li><a href="http://es6.ruanyifeng.com/" target="_blank" rel="external">阮一峰的ES6入门教程</a></li>
+<li><a href="http://www.ruanyifeng.com/blog/2015/05/thunk.html" target="_blank" rel="external">阮一峰关于Thunk函数的教程</a></li>
+<li><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*" target="_blank" rel="external">MDN的Generator函数介绍</a></li>
+<li><a href="https://davidwalsh.name/es6-generators" target="_blank" rel="external">ES6 Generators: Complete Series BY Kyle Simpson系列教程</a></li>
+<li><a href="http://liubin.org/promises-book/" target="_blank" rel="external">Promise迷你书 BY azu</a></li>
+</ul>
 
   	</div>
 	  
