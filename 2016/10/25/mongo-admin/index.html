@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <title>MongoDB权限管理 | Mirone</title>
+  <meta name="description" content="{{theme.description}}" />
+  <meta name="keywords" content="{{theme.keywords}}" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="pixiv-ID: 58984559
+
+MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境中，我们需要设置不同的权限方便开发者操作数据库但要避免开放所有权限引起的危险，因此如果使用mongodb，了解它的权限该如何分配是十分重要的。本文以Mac上使用homebrew安装的MongoDB^3.2.10版本为准，mongodb版本更新可能会导致命令的变化和不可用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MongoDB权限管理">
+<meta property="og:url" content="http://lovin0730.github.io/2016/10/25/mongo-admin/index.html">
+<meta property="og:site_name" content="Mirone">
+<meta property="og:description" content="pixiv-ID: 58984559
+
+MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境中，我们需要设置不同的权限方便开发者操作数据库但要避免开放所有权限引起的危险，因此如果使用mongodb，了解它的权限该如何分配是十分重要的。本文以Mac上使用homebrew安装的MongoDB^3.2.10版本为准，mongodb版本更新可能会导致命令的变化和不可用。">
+<meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/mongo-admin-cover.png">
+<meta property="og:updated_time" content="2016-10-25T09:15:19.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MongoDB权限管理">
+<meta name="twitter:description" content="pixiv-ID: 58984559
+
+MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境中，我们需要设置不同的权限方便开发者操作数据库但要避免开放所有权限引起的危险，因此如果使用mongodb，了解它的权限该如何分配是十分重要的。本文以Mac上使用homebrew安装的MongoDB^3.2.10版本为准，mongodb版本更新可能会导致命令的变化和不可用。">
+<meta name="twitter:image" content="http://oanr6klwj.bkt.clouddn.com/blog/mongo-admin-cover.png">
+  
+  
+    <link rel="icon" href="/favicon.ico">
+  
+  
+	<script src="https://use.typekit.net/eyf3hir.js"></script>
+  <script>try{Typekit.load({ async: false });}catch(e){}</script>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    function setLoadingBarProgress(num) {
+      document.getElementById('loading-bar').style.width=num+"%";
+    }
+  </script>
+</head>
+
+<body>
+  
+  <div id="loading-bar-wrapper">
+  <div id="loading-bar"></div>
+</div>
+
+  <script>setLoadingBarProgress(20)</script>
+  
+  <div id="site-wrapper">
+    
+    <header id="header">
+	<div id="header-wrapper" class="clearfix">
+		<a id="logo" href="/">
+			<img src="/images/logo.png" />
+			<span id="site-desc">
+			  mirone keeps alive
+      </span>
+		</a>
+		<button id="site-nav-switch">
+	    <span class="icon icon-menu"></span>
+	  </button>
+	</div>
+	<aside id="site-menu">
+  	<nav>
+  		
+        <a href="/" class="nav-home nav">
+          Home
+        </a>
+      
+    </nav>
+	</aside>
+</header>
+    <script>setLoadingBarProgress(40);</script>
+    
+    <main id="main" role="main">
+      <article id="post-mongo-admin"
+  class="post article white-box article-type-post"
+  itemscope itemprop="blogPost">
+	<h2 class="title">
+  	<a href="/2016/10/25/mongo-admin/">
+    	MongoDB权限管理
+    </a>
+  </h2>
+	<time>
+	  10月 25, 2016
+	</time>
+	<section class="content">
+  	<div class="article-entry" itemprop="articleBody">
+    	<p><img src="http://oanr6klwj.bkt.clouddn.com/blog/mongo-admin-cover.png" alt="cover"></p>
+<blockquote>
+<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=58984559" target="_blank" rel="external"><em>pixiv-ID: 58984559</em></a></p>
+</blockquote>
+<p>MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境中，我们需要设置不同的权限方便开发者操作数据库但要避免开放所有权限引起的危险，因此如果使用mongodb，了解它的权限该如何分配是十分重要的。<br>本文以Mac上使用homebrew安装的MongoDB^3.2.10版本为准，mongodb版本更新可能会导致命令的变化和不可用。</p>
+<a id="more"></a>
+<p>先开启数据库命令行，并创建admin数据库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ mongo</div><div class="line">use admin</div></pre></td></tr></table></figure></p>
+<p>创建用户的格式为：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">db.createUser(&#123;</div><div class="line">  user: <span class="string">'your username'</span>,</div><div class="line">  pwd: <span class="string">'your password'</span>,</div><div class="line">  customData: &#123;</div><div class="line">    <span class="string">"description"</span>: <span class="string">"your description"</span></div><div class="line">  &#125;,</div><div class="line">  roles: [</div><div class="line">    &#123;</div><div class="line">      role: <span class="string">"your role"</span>,</div><div class="line">      db: <span class="string">"the data base to set the user"</span></div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;)</div></pre></td></tr></table></figure></p>
+<p>其中cunstomData字段是可选的，可以不填。<br>roles支持为一个用户分配多个角色，用数组的形式来表示。<br>其中role字段的值由MongoDB提供，目前支持的有：</p>
+<blockquote>
+<ul>
+<li>数据库用户角色（Database User Roles）read、readWrite</li>
+<li>数据库管理角色（Database Administration Roles）dbAdmin、dbOwner、userAdmin</li>
+<li>管理员组（Cluster Administration Roles）clusterAdmin、clusterManager、clusterMonitor、hostManager</li>
+<li>备份还原角色组（Backup and Restoration Roles）backup、restore</li>
+<li>所有数据库角色（All-Database Roles）readAnyDatabase、readWriteAnyDatabase、userAdminAnyDatabase、dbAdminAnyDatabase</li>
+<li>超级管理员（Superuser Roles）root</li>
+<li>内部角色（Internal Role）_system（一般不建议设置）</li>
+</ul>
+<p>每个角色的具体职责请查阅<a href="http://docs.mongoing.com/manual-zh/reference/built-in-roles.html" target="_blank" rel="external">官网</a><br>建立完用户后，可以去相应数据库下进行验证，例如下面我将建立一个test数据库的user用户，他的权限为<code>dbOwner</code>，然后进行验证。</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">db.createUser(&#123;</div><div class="line">  user: <span class="string">'test'</span>,</div><div class="line">  pwd: <span class="string">'testpwd'</span>,</div><div class="line">  roles: [</div><div class="line">    &#123;</div><div class="line">      role: <span class="string">'dbOwner'</span>,</div><div class="line">      db: <span class="string">'test'</span></div><div class="line">    &#125;</div><div class="line">  ]</div><div class="line">&#125;)</div><div class="line">use test</div><div class="line">db.auth(<span class="string">'test'</span>, <span class="string">'testpwd'</span>)</div></pre></td></tr></table></figure>
+<p>然后我们需要在MongoDB的默认配置文件中开启安全认证，Homebrew安装的MongoDB的配置文件位置在<code>/usr/local/etc/mongod.conf</code>，我们在其中加入<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">security:</div><div class="line">  authorization: &quot;enabled&quot;</div></pre></td></tr></table></figure></p>
+<p>之后重启服务<br><code>$ brew services restart mongodb</code></p>
+<p>之后登陆mongodb就需要用户密码了</p>
+<ul>
+<li>使用shell登陆<br><code>$ mongo db -u username -p</code></li>
+<li>node中的连接<br><code>mongodb.connect(&#39;mongodb://user:pwd@host:port/db&#39;)</code></li>
+</ul>
+<p>db是要登陆的数据库的名字，登陆后进行权限不够的操作将会被拒绝，大大提升了安全性。</p>
+
+  	</div>
+	  
+	  <div class="article-tags tags">
+		  
+        <a class="tag-link" href="/tags/Database/">Database</a>
+      
+	  </div>
+	</section>
+</article>
+
+
+
+      <script>setLoadingBarProgress(60);</script>
+    </main>
+    
+    <footer id="footer" class="clearfix">
+  
+  
+	<div class="search">
+	  <form name="searchform" id="searchform" class="searchform">
+	    <input type="text" id="search_input" class="search_input" placeholder="Looking for something?" />
+	    <button type="submit" class="search-bar-trigger">
+	      <span class="icon icon-search"></span>
+	    </button>
+	  </form>
+	</div>
+	
+
+	<div class="social-wrapper">
+  	
+      
+        <a href="https://github.com/lovin0730" class="social github"
+          target="_blank" rel="external">
+          <span class="icon icon-github"></span>
+        </a>
+      
+        <a href="https://twitter.com/xy610888871" class="social twitter"
+          target="_blank" rel="external">
+          <span class="icon icon-twitter"></span>
+        </a>
+      
+    
+  </div>
+  
+  <div>Theme <span class="codename">Typescript</span> designed by <a href="http://rakugaki.me/" target="_blank">Art Chen</a>.</div>
+  <div>&copy; <a href="/">Mirone</a></div>
+  
+</footer>
+
+
+    <script>setLoadingBarProgress(80);</script>
+    
+  </div>
+
+  <div id="modal-search">
+  <div class="modal">
+    <header class="modal-header clearfix">
+      <form id="modal-searchform" class="modal-searchform searchform" name="modalSearchform">
+        <input type="text" id="modal-searchinput" class="modal-input search_input" />
+        <button type="submit" class="search-bar-trigger">
+  	      <span class="icon icon-search"></span>
+  	    </button>
+      </form>
+      <a class="close">
+        <span class="icon icon-close"></span>
+      </a>
+      <div class="loading">
+        <div class="bar"></div>
+      </div>
+    </header>
+    <main class="modal-body">
+      <ul class="results ajax-content" id="modal-search-results">
+        
+      </ul>
+    </main>
+    <footer class="modal-footer ajax-content clearfix">
+      <div class="meta">
+        <strong class="range"></strong> of <strong class="total"></strong>
+      </div>
+      <div class="error"></div>
+      <a class="nav next">
+        <span class="text">NEXT</span>
+        <span class="icon icon-chevron-right"></span>
+      </a>
+      <a class="nav prev">
+        <span class="icon icon-chevron-left"></span>
+        <span class="text">PREV</span>
+      </a>
+    </footer>
+  </div>
+  <div class="overlay"></div>
+</div>
+  
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>')</script>
+
+<script src="/js/jquery.fitvids.js"></script>
+<script>
+	var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
+	var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+  var SEARCH_SERVICE = "hexo";
+</script>
+<script src="/js/min/search.min.js"></script>
+<script src="/js/min/app.min.js"></script>
+
+
+  <script>setLoadingBarProgress(100);</script>
+  
+</body>
+</html>
