@@ -74,6 +74,65 @@
 
   
   <h2 class="title">
+    <a href="/2016/10/25/ssh-base/">
+      使用ssh进行远程连接
+    </a>
+  </h2>
+  
+  <time>
+    10月 25, 2016
+  </time>
+  <section class="content">
+	  <p>在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。</p>
+<p>SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥加密进行信息保护，过程为：</p>
+<ol>
+<li>远程主机收到用户登陆请求，发送公钥到用户。</li>
+<li>用户用公钥加密密码发送到远程主机。</li>
+<li>远程主机用私钥解密登录密码，密码正确则通过验证。</li>
+</ol>
+<p>如果通信被截获，内容也是加密过的，而不会直接暴露出来，因此一直是主流的网络安全解决方案之一。SSH有很多种实现，我们下文所说的OpenSSH就是其中一种。</p>
+<p>对于linux，一般使用的都是OpenSSH，对于尚未安装相应软件的机器，需要通过apt-get进行安装：<br><code>$ sudo apt-get install openssh-server openssh-client</code></p>
+<p>用SSH远程登陆时，通用的命令是(方括号中的内容是可选的)<br><code>$ ssh [-p port] user@host</code></p>
+<ul>
+<li>user代表远程所使用的登陆名(需被远程机器上有此用户名)</li>
+<li>host代表远程机器的地址</li>
+<li>默认会使用22作为远程主机的端口，如果你想改变端口，可以使用p参数</li>
+</ul>
+<p>如果想要退出登陆，只需要输入exit就能退出了。</p>
+<p>那么能不能不用每次输入密码登陆呢？当然可以，因为SSH支持公钥登陆。</p>
+<blockquote>
+<p>首先简单讲讲公钥验证机制：公钥(public key)和私钥(private key)是两份文件，服务端持有公钥，用来加密；客户端持有私钥，用来解密。客户端向服务端发起连接请求时，服务端会生成一串随机数，经过公钥加密后传给客户端。这时客户端会用私钥解密获取随机数，再返回服务端。最后服务端判断一下，如果客户端能够返回正确的随机数，就认为校验通过了 ，可以进行连接。否则就不能连接。</p>
+</blockquote>
+<p>用户需要提供自己的公钥，如果没有，可以生成一个，使用命令<br><code>$ ssh-keygen</code><br>这个命令会在默认为<code>$HOME/.ssh/</code>目录下生成两个文件，一个是<code>id_rsa.pub</code>(公钥)，另一个是<code>id_rsa</code>(私钥)，生成私钥的时候可能会询问你需要不需要设置口令(passphrase)，如果担心它的安全，可以设置一个。</p>
+<p>接着你就可以传送公钥到想要访问的主机上面：<br><code>$ ssh-copy-id user@host</code></p>
+<p>从此登陆这台主机，就不需要密码了。<br>需注意，主机的<code>/etc/ssh/sshd_config</code>文件中需存在以下命令。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">RSAAuthentication yes</div><div class="line">PubkeyAuthentication yes</div><div class="line">AuthorizedKeysFile .ssh/authorized_keys</div></pre></td></tr></table></figure></p>
+<p>有时需要在本地和远程机器间传送文件，我们可以使用scp命令来进行。</p>
+<ul>
+<li>上传文件到远程目录：<br><code>$ scp /path/file user@host:/path</code></li>
+<li>从远程目录下载文件：<br><code>$ scp user@host:/path/file /path</code></li>
+<li>上传文件夹到远程目录：<br><code>$ scp -r /path/dir user@host:/path</code></li>
+<li>从远程目录下载文件夹：<br><code>$ scp -r user@host:/path/dir /path</code></li>
+</ul>
+<p>最后谈谈SSH的局限性：</p>
+<p>SSH存在一个风险，就是SSH的协议公钥是没有证书公证的，也就是说，可能存在<strong>“中间人”</strong>截获了登陆请求，并冒充远程主机将自己伪造的公钥发送给用户，就能得到用户接下来发送的密码。这种攻击叫做<strong>中间人攻击</strong>。</p>
+<p>SSH解决的办法是在登陆时发送公钥指纹给用户，用户自己根据这一指纹和远程主机公布的指纹进行核对。用户也要自行承担风险。</p>
+
+
+    
+    
+    
+	  <div class="tags">
+      <a class="tag-link" href="/tags/Network/">Network</a>
+	  </div>
+    
+
+  </section>
+</article>
+  
+    <article class="post ">
+
+  
+  <h2 class="title">
     <a href="/2016/09/07/js-async/">
       JavaScript异步编程进化论
     </a>

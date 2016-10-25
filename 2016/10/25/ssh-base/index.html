@@ -4,18 +4,43 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   
-  <title>Archives | Mirone</title>
+  <title>使用ssh进行远程连接 | Mirone</title>
   <meta name="description" content="{{theme.description}}" />
   <meta name="keywords" content="{{theme.keywords}}" />
   <meta name="HandheldFriendly" content="True" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Mirone">
-<meta property="og:url" content="http://lovin0730.github.io/archives/index.html">
+  <meta name="description" content="在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。
+SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥加密进行信息保护，过程为：
+
+远程主机收到用户登陆请求，发送公钥到用户。
+用户用公钥加密密码发送到远程主机。
+远程主机用私钥解密登录密码，密码正确则通过验证。
+
+如果通信被截获，内容也是加密过的，而不会直接暴露出来，因此一直是主">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用ssh进行远程连接">
+<meta property="og:url" content="http://lovin0730.github.io/2016/10/25/ssh-base/index.html">
 <meta property="og:site_name" content="Mirone">
+<meta property="og:description" content="在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。
+SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥加密进行信息保护，过程为：
+
+远程主机收到用户登陆请求，发送公钥到用户。
+用户用公钥加密密码发送到远程主机。
+远程主机用私钥解密登录密码，密码正确则通过验证。
+
+如果通信被截获，内容也是加密过的，而不会直接暴露出来，因此一直是主">
+<meta property="og:updated_time" content="2016-10-25T06:13:22.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Mirone">
+<meta name="twitter:title" content="使用ssh进行远程连接">
+<meta name="twitter:description" content="在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。
+SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥加密进行信息保护，过程为：
+
+远程主机收到用户登陆请求，发送公钥到用户。
+用户用公钥加密密码发送到远程主机。
+远程主机用私钥解密登录密码，密码正确则通过验证。
+
+如果通信被截获，内容也是加密过的，而不会直接暴露出来，因此一直是主">
   
   
     <link rel="icon" href="/favicon.ico">
@@ -66,24 +91,20 @@
     <script>setLoadingBarProgress(40);</script>
     
     <main id="main" role="main">
-      
-
-<section class="post-list">
-	
-    <article class="post ">
-
-  
-  <h2 class="title">
-    <a href="/2016/10/25/ssh-base/">
-      使用ssh进行远程连接
+      <article id="post-ssh-base"
+  class="post article white-box article-type-post"
+  itemscope itemprop="blogPost">
+	<h2 class="title">
+  	<a href="/2016/10/25/ssh-base/">
+    	使用ssh进行远程连接
     </a>
   </h2>
-  
-  <time>
-    10月 25, 2016
-  </time>
-  <section class="content">
-	  <p>在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。</p>
+	<time>
+	  10月 25, 2016
+	</time>
+	<section class="content">
+  	<div class="article-entry" itemprop="articleBody">
+    	<p>在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。</p>
 <p>SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥加密进行信息保护，过程为：</p>
 <ol>
 <li>远程主机收到用户登陆请求，发送公钥到用户。</li>
@@ -117,157 +138,16 @@
 <p>SSH存在一个风险，就是SSH的协议公钥是没有证书公证的，也就是说，可能存在<strong>“中间人”</strong>截获了登陆请求，并冒充远程主机将自己伪造的公钥发送给用户，就能得到用户接下来发送的密码。这种攻击叫做<strong>中间人攻击</strong>。</p>
 <p>SSH解决的办法是在登陆时发送公钥指纹给用户，用户自己根据这一指纹和远程主机公布的指纹进行核对。用户也要自行承担风险。</p>
 
-
-    
-    
-    
-	  <div class="tags">
-      <a class="tag-link" href="/tags/Network/">Network</a>
+  	</div>
+	  
+	  <div class="article-tags tags">
+		  
+        <a class="tag-link" href="/tags/Network/">Network</a>
+      
 	  </div>
-    
-
-  </section>
+	</section>
 </article>
-  
-    <article class="post ">
 
-  
-  <h2 class="title">
-    <a href="/2016/09/07/js-async/">
-      JavaScript异步编程进化论
-    </a>
-  </h2>
-  
-  <time>
-    9月 7, 2016
-  </time>
-  <section class="content">
-	  <p><img src="http://oanr6klwj.bkt.clouddn.com/blog/js-async-cover.jpg" alt="cover"></p>
-<blockquote>
-<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=16810195"><em>pixiv-ID: 16810195</em></a></p>
-</blockquote>
-<p>众所周知，JavaScript的执行环境是单线程的，这意味着如果有很多任务，就只能排队一个一个执行。请看下面的例子。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="number">1</span>);</div><div class="line"><span class="keyword">var</span> X = <span class="number">100000</span>;</div><div class="line"><span class="keyword">for</span>(<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; X; i++) &#123;</div><div class="line">&#125;</div><div class="line"><span class="built_in">console</span>.log(<span class="number">2</span>);</div></pre></td></tr></table></figure></p>
-<p>随着X的增大，打印1和2之间出现的时间间隔也在明显变长。对此，JavaScript采取异步来处理这种问题。<br>
-
-    
-	  <div class="readmore">
-      <a href="/2016/09/07/js-async/">Read More</a>
-    </div>
-    
-    
-    
-	  <div class="tags">
-      <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
-	  </div>
-    
-
-  </section>
-</article>
-  
-    <article class="post ">
-
-  
-  <h2 class="title">
-    <a href="/2016/09/04/nodejs-mysql-session/">
-      使用MySQL配合Node.js进行简单session校验
-    </a>
-  </h2>
-  
-  <time>
-    9月 4, 2016
-  </time>
-  <section class="content">
-	  <p><img src="http://oanr6klwj.bkt.clouddn.com/blog/nodejs-mysql-session-cover.jpg" alt="cover"></p>
-<blockquote>
-<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=52610961"><em>pixiv-ID: 52610961</em></a></p>
-</blockquote>
-<p>session是web应用保持会话的一种相对安全有效又简单的方式，通常的做法是在每当客户端发起请求，服务端就会在返回的响应头信息中添加一个字段，同时将这个字段携带的信息记录在服务端。这样，当下次客户端发起请求的时候，服务端只要检查客户端携带的cookie，将它与服务端存储的数据做对比。就可以得知客户端当前状态，从而确保会话的连接了。</p>
-
-    
-	  <div class="readmore">
-      <a href="/2016/09/04/nodejs-mysql-session/">Read More</a>
-    </div>
-    
-    
-    
-	  <div class="tags">
-      <a class="tag-link" href="/tags/Back-End/">Back-End</a><a class="tag-link" href="/tags/Node-js/">Node.js</a>
-	  </div>
-    
-
-  </section>
-</article>
-  
-    <article class="post ">
-
-  
-  <h2 class="title">
-    <a href="/2016/08/27/cors-and-cookies/">
-      CORS和Cookies
-    </a>
-  </h2>
-  
-  <time>
-    8月 27, 2016
-  </time>
-  <section class="content">
-	  <p><img src="http://oanr6klwj.bkt.clouddn.com/blog/cors-and-cookies-cover.jpg" alt="cover"></p>
-<blockquote>
-<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=56852068"><em>pixiv-ID: 56852068</em></a></p>
-</blockquote>
-<p>本次的项目是为一个短期活动搭建Node.js服务端，部署在服务器上后发现同事在自己的本机使用需要携带Cookie的AJAX请求调用接口的时候,受到了同源策略的限制。因此我们需要在服务端对跨域请求开放许可。</p>
-
-    
-	  <div class="readmore">
-      <a href="/2016/08/27/cors-and-cookies/">Read More</a>
-    </div>
-    
-    
-    
-	  <div class="tags">
-      <a class="tag-link" href="/tags/Back-End/">Back-End</a><a class="tag-link" href="/tags/Node-js/">Node.js</a>
-	  </div>
-    
-
-  </section>
-</article>
-  
-    <article class="post ">
-
-  
-  <h2 class="title">
-    <a href="/2016/07/15/temperature-curve/">
-      实现温度曲线过程中的思考
-    </a>
-  </h2>
-  
-  <time>
-    7月 15, 2016
-  </time>
-  <section class="content">
-	  <p><img src="http://oanr6klwj.bkt.clouddn.com/blog/temperature-curve-cover.png" alt="cover"></p>
-<blockquote>
-<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=50140585"><em>pixiv-ID: 50140585</em></a></p>
-</blockquote>
-<p>上周接到的需求是实现QQ浏览器中的一个温度曲线。具体来说就是传入一组数据，数据包括6天的当日最高温度和最低温度，由此拟合出一条曲线。</p>
-<p>曲线使用canvas进行绘制，因此有原生的贝塞尔曲线api可以使用。我们应该最大化的利用这个先天优势，避免过多的数学计算。</p>
-
-    
-	  <div class="readmore">
-      <a href="/2016/07/15/temperature-curve/">Read More</a>
-    </div>
-    
-    
-    
-	  <div class="tags">
-      <a class="tag-link" href="/tags/Front-End/">Front-End</a><a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
-	  </div>
-    
-
-  </section>
-</article>
-  
-</section>
 
 
       <script>setLoadingBarProgress(60);</script>
