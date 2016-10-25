@@ -21,7 +21,7 @@ MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境�
 
 MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境中，我们需要设置不同的权限方便开发者操作数据库但要避免开放所有权限引起的危险，因此如果使用mongodb，了解它的权限该如何分配是十分重要的。本文以Mac上使用homebrew安装的MongoDB^3.2.10版本为准，mongodb版本更新可能会导致命令的变化和不可用。">
 <meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/mongo-admin-cover.png">
-<meta property="og:updated_time" content="2016-10-25T09:15:19.000Z">
+<meta property="og:updated_time" content="2016-10-25T15:11:46.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MongoDB权限管理">
 <meta name="twitter:description" content="pixiv-ID: 58984559
@@ -133,6 +133,10 @@ MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境�
 </article>
 
 
+<section id="comments">
+	<div id="disqus_thread"></div>
+</section>
+
 
       <script>setLoadingBarProgress(60);</script>
     </main>
@@ -215,6 +219,20 @@ MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境�
   <div class="overlay"></div>
 </div>
   
+<script>
+  var disqus_shortname = 'mirone.disqus.com';
+  
+  var disqus_url = 'http://lovin0730.github.io/2016/10/25/mongo-admin/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
 
 <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <script>window.jQuery || document.write('<script src="/js/jquery.min.js"><\/script>')</script>
