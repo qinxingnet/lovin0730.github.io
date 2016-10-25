@@ -10,37 +10,39 @@
   <meta name="HandheldFriendly" content="True" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。
+  <meta name="description" content="pixiv-ID: 59600727
+
+在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。
 SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥加密进行信息保护，过程为：
 
 远程主机收到用户登陆请求，发送公钥到用户。
 用户用公钥加密密码发送到远程主机。
-远程主机用私钥解密登录密码，密码正确则通过验证。
-
-如果通信被截获，内容也是加密过的，而不会直接暴露出来，因此一直是主">
+远程主机用私钥解密登录密码，密码正确则通过验证。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用ssh进行远程连接">
 <meta property="og:url" content="http://lovin0730.github.io/2016/10/25/ssh-base/index.html">
 <meta property="og:site_name" content="Mirone">
-<meta property="og:description" content="在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。
+<meta property="og:description" content="pixiv-ID: 59600727
+
+在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。
 SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥加密进行信息保护，过程为：
 
 远程主机收到用户登陆请求，发送公钥到用户。
 用户用公钥加密密码发送到远程主机。
-远程主机用私钥解密登录密码，密码正确则通过验证。
-
-如果通信被截获，内容也是加密过的，而不会直接暴露出来，因此一直是主">
-<meta property="og:updated_time" content="2016-10-25T06:13:22.000Z">
+远程主机用私钥解密登录密码，密码正确则通过验证。">
+<meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/ssh-base-cover.png">
+<meta property="og:updated_time" content="2016-10-25T06:24:38.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用ssh进行远程连接">
-<meta name="twitter:description" content="在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。
+<meta name="twitter:description" content="pixiv-ID: 59600727
+
+在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。
 SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥加密进行信息保护，过程为：
 
 远程主机收到用户登陆请求，发送公钥到用户。
 用户用公钥加密密码发送到远程主机。
-远程主机用私钥解密登录密码，密码正确则通过验证。
-
-如果通信被截获，内容也是加密过的，而不会直接暴露出来，因此一直是主">
+远程主机用私钥解密登录密码，密码正确则通过验证。">
+<meta name="twitter:image" content="http://oanr6klwj.bkt.clouddn.com/blog/ssh-base-cover.png">
   
   
     <link rel="icon" href="/favicon.ico">
@@ -104,13 +106,18 @@ SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥�
 	</time>
 	<section class="content">
   	<div class="article-entry" itemprop="articleBody">
-    	<p>在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。</p>
+    	<p><img src="http://oanr6klwj.bkt.clouddn.com/blog/ssh-base-cover.png" alt="cover"></p>
+<blockquote>
+<p><a href="http://www.pixiv.net/member_illust.php?mode=medium&amp;illust_id=59600727" target="_blank" rel="external"><em>pixiv-ID: 59600727</em></a></p>
+</blockquote>
+<p>在开发场景中，开发人员免不了和服务器打交道，无论是连接服务器还是自己虚拟机中搭建的开发环境，都离不开SSH的应用。</p>
 <p>SSH是一种网络协议，用于计算机之间的加密登陆。通过公钥加密进行信息保护，过程为：</p>
 <ol>
 <li>远程主机收到用户登陆请求，发送公钥到用户。</li>
 <li>用户用公钥加密密码发送到远程主机。</li>
 <li>远程主机用私钥解密登录密码，密码正确则通过验证。</li>
 </ol>
+<a id="more"></a>
 <p>如果通信被截获，内容也是加密过的，而不会直接暴露出来，因此一直是主流的网络安全解决方案之一。SSH有很多种实现，我们下文所说的OpenSSH就是其中一种。</p>
 <p>对于linux，一般使用的都是OpenSSH，对于尚未安装相应软件的机器，需要通过apt-get进行安装：<br><code>$ sudo apt-get install openssh-server openssh-client</code></p>
 <p>用SSH远程登陆时，通用的命令是(方括号中的内容是可选的)<br><code>$ ssh [-p port] user@host</code></p>
