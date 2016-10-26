@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Mirone</title>
-  
+  <subtitle>Mirone&#39;s blog</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://lovin0730.github.io/"/>
@@ -306,7 +306,7 @@
     <link href="http://lovin0730.github.io/2016/07/15/temperature-curve/"/>
     <id>http://lovin0730.github.io/2016/07/15/temperature-curve/</id>
     <published>2016-07-15T07:17:16.000Z</published>
-    <updated>2016-09-07T09:14:21.000Z</updated>
+    <updated>2016-10-26T06:43:13.000Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://oanr6klwj.bkt.clouddn.com/blog/temperature-curve-cover.png" alt="cover"></p>
 <blockquote>
@@ -370,9 +370,9 @@
     </summary>
     
     
-      <category term="JavaScript" scheme="http://lovin0730.github.io/tags/javascript/"/>
-    
       <category term="Front-End" scheme="http://lovin0730.github.io/tags/front-end/"/>
+    
+      <category term="JavaScript" scheme="http://lovin0730.github.io/tags/javascript/"/>
     
   </entry>
   
