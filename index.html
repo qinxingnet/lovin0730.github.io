@@ -60,6 +60,14 @@
           Home
         </a>
       
+        <a href="/archives" class="nav-archives nav">
+          Archives
+        </a>
+      
+        <a href="/atom.xml" class="nav-rss nav">
+          RSS
+        </a>
+      
     </nav>
 	</aside>
 </header>
@@ -67,6 +75,10 @@
     
     <main id="main" role="main">
       
+
+
+
+
 
 <section class="post-list">
 	
@@ -97,7 +109,7 @@
     
     
 	  <div class="tags">
-      <a class="tag-link" href="/tags/Database/">Database</a>
+      <a class="tag-link" href="/tags/database/">Database</a>
 	  </div>
     
 
@@ -137,7 +149,7 @@
     
     
 	  <div class="tags">
-      <a class="tag-link" href="/tags/Network/">Network</a>
+      <a class="tag-link" href="/tags/network/">Network</a>
 	  </div>
     
 
@@ -172,7 +184,7 @@
     
     
 	  <div class="tags">
-      <a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+      <a class="tag-link" href="/tags/javascript/">JavaScript</a>
 	  </div>
     
 
@@ -206,7 +218,7 @@
     
     
 	  <div class="tags">
-      <a class="tag-link" href="/tags/Back-End/">Back-End</a><a class="tag-link" href="/tags/Node-js/">Node.js</a>
+      <a class="tag-link" href="/tags/back-end/">Back-End</a><a class="tag-link" href="/tags/node-js/">Node.js</a>
 	  </div>
     
 
@@ -240,7 +252,7 @@
     
     
 	  <div class="tags">
-      <a class="tag-link" href="/tags/Back-End/">Back-End</a><a class="tag-link" href="/tags/Node-js/">Node.js</a>
+      <a class="tag-link" href="/tags/back-end/">Back-End</a><a class="tag-link" href="/tags/node-js/">Node.js</a>
 	  </div>
     
 
@@ -275,7 +287,7 @@
     
     
 	  <div class="tags">
-      <a class="tag-link" href="/tags/Front-End/">Front-End</a><a class="tag-link" href="/tags/JavaScript/">JavaScript</a>
+      <a class="tag-link" href="/tags/front-end/">Front-End</a><a class="tag-link" href="/tags/javascript/">JavaScript</a>
 	  </div>
     
 
@@ -292,9 +304,9 @@
   
   
 	<div class="search">
-	  <form name="searchform" id="searchform" class="searchform">
-	    <input type="text" id="search_input" class="search_input" placeholder="Looking for something?" />
-	    <button type="submit" class="search-bar-trigger">
+	  <form name="searchform" id="searchform" class="u-search-form">
+	    <input type="text" id="searchinput" class="u-search-input" placeholder="Looking for something?" />
+	    <button type="submit" id="u-search-btn-submit" class="u-search-btn-submit">
 	      <span class="icon icon-search"></span>
 	    </button>
 	  </form>
@@ -327,44 +339,6 @@
     
   </div>
 
-  <div id="modal-search">
-  <div class="modal">
-    <header class="modal-header clearfix">
-      <form id="modal-searchform" class="modal-searchform searchform" name="modalSearchform">
-        <input type="text" id="modal-searchinput" class="modal-input search_input" />
-        <button type="submit" class="search-bar-trigger">
-  	      <span class="icon icon-search"></span>
-  	    </button>
-      </form>
-      <a class="close">
-        <span class="icon icon-close"></span>
-      </a>
-      <div class="loading">
-        <div class="bar"></div>
-      </div>
-    </header>
-    <main class="modal-body">
-      <ul class="results ajax-content" id="modal-search-results">
-        
-      </ul>
-    </main>
-    <footer class="modal-footer ajax-content clearfix">
-      <div class="meta">
-        <strong class="range"></strong> of <strong class="total"></strong>
-      </div>
-      <div class="error"></div>
-      <a class="nav next">
-        <span class="text">NEXT</span>
-        <span class="icon icon-chevron-right"></span>
-      </a>
-      <a class="nav prev">
-        <span class="icon icon-chevron-left"></span>
-        <span class="text">PREV</span>
-      </a>
-    </footer>
-  </div>
-  <div class="overlay"></div>
-</div>
   
 <script>
   var disqus_shortname = 'mirone';
@@ -386,10 +360,17 @@
 <script>
 	var GOOGLE_CUSTOM_SEARCH_API_KEY = "";
 	var GOOGLE_CUSTOM_SEARCH_ENGINE_ID = "";
+	var ALGOLIA_API_KEY = "";
+	var ALGOLIA_APP_ID = "";
+	var ALGOLIA_INDEX_NAME = "";
+  var AZURE_SERVICE_NAME = "";
+  var AZURE_INDEX_NAME = "";
+  var AZURE_QUERY_KEY = "";
+  var BAIDU_API_ID = "";
   var SEARCH_SERVICE = "hexo";
 </script>
-<script src="/js/min/search.min.js"></script>
-<script src="/js/min/app.min.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/app.js"></script>
 
 
   <script>setLoadingBarProgress(100);</script>
