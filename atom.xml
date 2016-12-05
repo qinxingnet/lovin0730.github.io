@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://lovin0730.github.io/"/>
-  <updated>2016-12-05T02:26:54.000Z</updated>
+  <updated>2016-12-05T02:31:13.000Z</updated>
   <id>http://lovin0730.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://lovin0730.github.io/2016/10/25/mongo-admin/"/>
     <id>http://lovin0730.github.io/2016/10/25/mongo-admin/</id>
     <published>2016-10-25T07:12:34.000Z</published>
-    <updated>2016-12-05T02:26:54.000Z</updated>
+    <updated>2016-12-05T02:31:13.000Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://oanr6klwj.bkt.clouddn.com/blog/mongo-admin-cover.png" alt="cover"></p>
 <blockquote>
@@ -62,9 +62,9 @@
 </ol>
 <p>&#x51E0;&#x4E2A;&#x5E38;&#x7528;&#x7684;&#x547D;&#x4EE4;&#xFF1A;</p>
 <ul>
-<li>db.system.users.find()&#x2014;&#x2014;&#x67E5;&#x770B;&#x5DF2;&#x5B58;&#x5728;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;</li>
-<li>db.system.users.remove({user: username})&#x2014;&#x2014;&#x5220;&#x9664;&#x4E00;&#x4E2A;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x8D85;&#x7EA7;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;</li>
-<li>show users&#x2014;&#x2014;&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6570;&#x636E;&#x5E93;&#x7684;&#x7528;&#x6237;</li>
+<li>&#x67E5;&#x770B;&#x5DF2;&#x5B58;&#x5728;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;<br><code>db.system.users.find()</code></li>
+<li>&#x5220;&#x9664;&#x4E00;&#x4E2A;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x8D85;&#x7EA7;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;<br><code>db.system.users.remove({user: username})</code></li>
+<li>&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6570;&#x636E;&#x5E93;&#x7684;&#x7528;&#x6237;<br><code>show users</code></li>
 </ul>
 ]]></content>
     

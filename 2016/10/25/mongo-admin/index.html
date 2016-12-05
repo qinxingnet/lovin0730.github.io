@@ -21,7 +21,7 @@ MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境�
 
 MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境中，我们需要设置不同的权限方便开发者操作数据库但要避免开放所有权限引起的危险，因此如果使用mongodb，了解它的权限该如何分配是十分重要的。本文以Mac上使用homebrew安装的MongoDB^3.2.10版本为准，mongodb版本更新可能会导致命令的变化和不可用。">
 <meta property="og:image" content="http://oanr6klwj.bkt.clouddn.com/blog/mongo-admin-cover.png">
-<meta property="og:updated_time" content="2016-12-05T02:26:54.000Z">
+<meta property="og:updated_time" content="2016-12-05T02:31:13.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MongoDB权限管理">
 <meta name="twitter:description" content="pixiv-ID: 58984559
@@ -139,9 +139,9 @@ MongoDB数据库默认是不需要用户名和登陆密码的，在实际环境�
 </ol>
 <p>&#x51E0;&#x4E2A;&#x5E38;&#x7528;&#x7684;&#x547D;&#x4EE4;&#xFF1A;</p>
 <ul>
-<li>db.system.users.find()&#x2014;&#x2014;&#x67E5;&#x770B;&#x5DF2;&#x5B58;&#x5728;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;</li>
-<li>db.system.users.remove({user: username})&#x2014;&#x2014;&#x5220;&#x9664;&#x4E00;&#x4E2A;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x8D85;&#x7EA7;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;</li>
-<li>show users&#x2014;&#x2014;&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6570;&#x636E;&#x5E93;&#x7684;&#x7528;&#x6237;</li>
+<li>&#x67E5;&#x770B;&#x5DF2;&#x5B58;&#x5728;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;<br><code>db.system.users.find()</code></li>
+<li>&#x5220;&#x9664;&#x4E00;&#x4E2A;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x8D85;&#x7EA7;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;<br><code>db.system.users.remove({user: username})</code></li>
+<li>&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6570;&#x636E;&#x5E93;&#x7684;&#x7528;&#x6237;<br><code>show users</code></li>
 </ul>
 
   	</div>
