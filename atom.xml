@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://lovin0730.github.io/"/>
-  <updated>2016-10-25T15:11:46.000Z</updated>
+  <updated>2016-12-05T02:26:54.000Z</updated>
   <id>http://lovin0730.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="http://lovin0730.github.io/2016/10/25/mongo-admin/"/>
     <id>http://lovin0730.github.io/2016/10/25/mongo-admin/</id>
     <published>2016-10-25T07:12:34.000Z</published>
-    <updated>2016-10-25T15:11:46.000Z</updated>
+    <updated>2016-12-05T02:26:54.000Z</updated>
     
     <content type="html"><![CDATA[<p><img src="http://oanr6klwj.bkt.clouddn.com/blog/mongo-admin-cover.png" alt="cover"></p>
 <blockquote>
@@ -52,6 +52,20 @@
 <li>node&#x4E2D;&#x7684;&#x8FDE;&#x63A5;<br><code>mongodb.connect(&apos;mongodb://user:pwd@host:port/db&apos;)</code></li>
 </ul>
 <p>db&#x662F;&#x8981;&#x767B;&#x9646;&#x7684;&#x6570;&#x636E;&#x5E93;&#x7684;&#x540D;&#x5B57;&#xFF0C;&#x767B;&#x9646;&#x540E;&#x8FDB;&#x884C;&#x6743;&#x9650;&#x4E0D;&#x591F;&#x7684;&#x64CD;&#x4F5C;&#x5C06;&#x4F1A;&#x88AB;&#x62D2;&#x7EDD;&#xFF0C;&#x5927;&#x5927;&#x63D0;&#x5347;&#x4E86;&#x5B89;&#x5168;&#x6027;&#x3002;</p>
+<p>&#x4E4B;&#x540E;&#x5F53;&#x6211;&#x4EEC;&#x8981;&#x4E3A;&#x67D0;&#x4E2A;&#x6570;&#x636E;&#x5E93;&#x6DFB;&#x52A0;&#x65B0;&#x7684;&#x7528;&#x6237;&#x65F6;&#xFF0C;&#x8FDB;&#x884C;&#x7684;&#x64CD;&#x4F5C;&#x5982;&#x4E0B;&#xFF1A;</p>
+<ol>
+<li>&#x4F7F;&#x7528;&#x7BA1;&#x7406;&#x5458;&#x8D26;&#x6237;&#x767B;&#x5F55;mongodb</li>
+<li>&#x5207;&#x6362;&#x81F3;&#x8981;&#x6DFB;&#x52A0;&#x7528;&#x6237;&#x7684;&#x6570;&#x636E;&#x5E93;</li>
+<li>&#x6DFB;&#x52A0;&#x7528;&#x6237;</li>
+<li>&#x4F7F;&#x7528;db.auth({username, pwd})&#x6765;&#x8BA4;&#x8BC1;&#x7528;&#x6237;</li>
+<li>&#x9000;&#x51FA;&#x7BA1;&#x7406;&#x5458;&#x8D26;&#x6237;&#xFF0C;&#x7528;&#x65B0;&#x521B;&#x5EFA;&#x7684;&#x7528;&#x6237;&#x767B;&#x5F55;&#x8BE5;&#x6570;&#x636E;&#x5E93;&#x8FDB;&#x884C;&#x68C0;&#x67E5;</li>
+</ol>
+<p>&#x51E0;&#x4E2A;&#x5E38;&#x7528;&#x7684;&#x547D;&#x4EE4;&#xFF1A;</p>
+<ul>
+<li>db.system.users.find()&#x2014;&#x2014;&#x67E5;&#x770B;&#x5DF2;&#x5B58;&#x5728;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;</li>
+<li>db.system.users.remove({user: username})&#x2014;&#x2014;&#x5220;&#x9664;&#x4E00;&#x4E2A;&#x7528;&#x6237;&#xFF08;&#x9700;&#x8981;&#x8D85;&#x7EA7;&#x7BA1;&#x7406;&#x5458;&#x6743;&#x9650;&#xFF09;</li>
+<li>show users&#x2014;&#x2014;&#x67E5;&#x770B;&#x5F53;&#x524D;&#x6570;&#x636E;&#x5E93;&#x7684;&#x7528;&#x6237;</li>
+</ul>
 ]]></content>
     
     <summary type="html">
